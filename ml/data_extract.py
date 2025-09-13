@@ -21,7 +21,6 @@ bbox = {
     "north": 15.10
 }
 
-# ========= STEP 1: CLIP TO BBOX =========
 with rasterio.open(raw_dem_path) as src:
     geom = box(bbox["west"], bbox["south"], bbox["east"], bbox["north"])
     out_image, out_transform = mask(src, [mapping(geom)], crop=True)
@@ -40,12 +39,10 @@ with rasterio.open(clipped_dem, "w", **out_meta) as dest:
 
 print(f"✅ Clipped DEM saved at {clipped_dem}")
 
-# ========= STEP 2: REPROJECT TO UTM =========
 reproj_dem = os.path.join(out_dir, "dem_utm.tif")
 gdal.Warp(reproj_dem, clipped_dem, dstSRS="EPSG:32643")  # UTM Zone 43N
 print(f"✅ Reprojected DEM saved at {reproj_dem}")
 
-# ========= STEP 3: DERIVE FEATURES =========
 slope_path = os.path.join(out_dir, "slope.tif")
 aspect_path = os.path.join(out_dir, "aspect.tif")
 hillshade_path = os.path.join(out_dir, "hillshade.tif")
@@ -56,10 +53,9 @@ gdal.DEMProcessing(hillshade_path, reproj_dem, "hillshade", format="GTiff", comp
 
 print("✅ Derived slope, aspect, and hillshade TIFFs")
 
-# ========= STEP 4: PATCH → CSV =========
 csv_path = os.path.join(out_dir, "mine_dataset.csv")
 
-# Larger patches = fewer rows
+
 PATCH_SIZE = 300  # meters
 
 # Open sources
@@ -84,7 +80,7 @@ for row in range(0, dem_src.height, PATCH_SIZE // int(res)):
         bounds = rasterio.windows.bounds(window, transform)
         left, bottom, right, top = bounds
 
-        # Read with masking → converts nodata to np.nan
+
         dem_patch = dem_src.read(1, window=window, boundless=True, masked=True).filled(np.nan)
         slope_patch = slope_src.read(1, window=window, boundless=True, masked=True).filled(np.nan)
         aspect_patch = aspect_src.read(1, window=window, boundless=True, masked=True).filled(np.nan)
@@ -92,11 +88,11 @@ for row in range(0, dem_src.height, PATCH_SIZE // int(res)):
         if np.isnan(dem_patch).all():
             continue
 
-        # Clean slope/aspect ranges
+
         slope_patch = np.where((slope_patch < 0) | (slope_patch > 90), np.nan, slope_patch)
         aspect_patch = np.where((aspect_patch < 0) | (aspect_patch > 360), np.nan, aspect_patch)
 
-        # Center coords (still UTM for now)
+
         center_lon = (left + right) / 2
         center_lat = (top + bottom) / 2
 
@@ -130,7 +126,6 @@ df = pd.DataFrame(records)
 df.to_csv(csv_path, index=False)
 print(f"✅ CSV saved at {csv_path} with {len(df)} patches")
 
-# ========= STEP 5: PREVIEW =========
 with rasterio.open(slope_path) as src:
     slope = src.read(1)
 plt.imshow(slope, cmap="terrain", vmin=0, vmax=60)
