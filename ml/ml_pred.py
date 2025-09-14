@@ -1,5 +1,3 @@
-# ml_pred.py
-
 import uvicorn
 import pandas as pd
 import xgboost as xgb
@@ -8,22 +6,15 @@ from ultralytics import YOLO
 from PIL import Image
 import io
 import json
-import os # <-- Add this import
-
 app = FastAPI(title="Rockfall Fusion API")
-
-# Correct the path to the model file to be relative to the script's location
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-XGB_MODEL_PATH = os.path.join(SCRIPT_DIR, "rockfall_sensor_environment_model.json")
-YOLO_MODEL_PATH = os.path.join(SCRIPT_DIR, "vision_rocks_cracks.pt")
 
 # XGBoost model
 xgb_model = xgb.XGBClassifier()
-# CORRECTED: Use the absolute path to load the model
-xgb_model.load_model(XGB_MODEL_PATH)
+xgb_model.load_model("rockfall_sensor_environment_model.json")
 
 # YOLO image model
-yolo_model = YOLO(YOLO_MODEL_PATH)
+MODEL_PATH = "vision_rocks_cracks.pt"
+yolo_model = YOLO(MODEL_PATH)
 
 EXPECTED_COLUMNS = [
     'temperature', 'rainfall', 'soil_moisture', 'vib_rms',
@@ -35,7 +26,7 @@ EXPECTED_COLUMNS = [
 
 @app.post("/rockfall/predict")
 async def fusion_predict(
-    tabular_data: str = Form(...),
+    tabular_data: str = Form(...),  # receive as string
     file: UploadFile = File(...)
 ):
     try:
@@ -61,7 +52,7 @@ async def fusion_predict(
                 })
                 yolo_score = max(yolo_score, float(conf))
 
-        alpha, beta = 0.6, 0.4
+        alpha, beta = 0.6, 0.4  # weights
         fused_scores, risk_levels = [], []
 
         for prob in rockfall_probs:
@@ -85,5 +76,5 @@ async def fusion_predict(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     uvicorn.run("ml_pred:app", host="0.0.0.0", port=8000, reload=True)
