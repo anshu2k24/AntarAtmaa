@@ -1,17 +1,58 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { FaUpload, FaDownload } from 'react-icons/fa';
 
-// Placeholder data for Geo-TIFF images, in a real app this would come from an API
-const geoTiffData = [
-  { id: 1, name: 'Mine A_1.tif', location: '45.7112° N, 74.2097° W', status: 'Critical' },
-  { id: 2, name: 'Mine B_2.tif', location: '46.1234° N, 75.5678° W', status: 'Warning' },
-  // { id: 3, name: 'Mine C_3.tif', location: '47.8765° N, 76.1234° W', status: 'Safe' },
-  // Add more Geo-TIFF objects here to see the layout expand
-];
+// IMPORTANT: Replace this with a real user ID after a successful login
+const DUMMY_USER_ID = 'your_hardcoded_user_id';
+
+// Define a type for your Geo-TIFF data
+interface GeoTiffData {
+  url: string;
+  riskLevel: 'High' | 'Low' | 'Medium' | 'Unknown';
+}
 
 const RiskMapsPage = () => {
+  const [geoTiffData, setGeoTiffData] = useState<GeoTiffData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/api/dashboard/${DUMMY_USER_ID}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        const data = await response.json();
+        // The backend returns an object with geoTiffImages
+        setGeoTiffData(data.geoTiffImages);
+      } catch (error) {
+        console.error('Error fetching risk maps:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  // Determine if Geo-TIFFs are available
   const hasGeoTiff = geoTiffData.length > 0;
+
+  // Function to determine the color of the risk tag
+  const getRiskColor = (riskLevel: string) => {
+    if (riskLevel.toLowerCase() === 'high') return 'bg-red-500';
+    if (riskLevel.toLowerCase() === 'medium') return 'bg-yellow-500';
+    if (riskLevel.toLowerCase() === 'low') return 'bg-green-500';
+    return 'bg-gray-500';
+  };
+
+  if (loading) {
+    return (
+      <div className="text-center py-20">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -30,21 +71,18 @@ const RiskMapsPage = () => {
       <div className="bg-[#1e293b] p-6 rounded-lg shadow-lg">
         {hasGeoTiff ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {geoTiffData.map((map) => (
-              <div key={map.id} className="bg-[#2a3648] rounded-lg p-6 flex flex-col items-center justify-center relative">
+            {geoTiffData.map((map, index) => (
+              <div key={index} className="bg-[#2a3648] rounded-lg p-6 flex flex-col items-center justify-center relative">
                 <div className="bg-gray-800 h-64 w-full rounded-lg mb-4 flex items-center justify-center text-gray-500">
-                  {/* Placeholder for the map image/component */}
-                  <span className="text-sm">Map of {map.name}</span>
+                  {/* For production, you can replace this with an <img> tag */}
+                  <span className="text-sm">{`Map ${index + 1}`}</span>
                 </div>
                 <div className="w-full text-center">
-                  <h3 className="text-lg font-semibold text-white">{map.name}</h3>
-                  <p className="text-sm text-gray-400">{map.location}</p>
+                  <h3 className="text-lg font-semibold text-white">Uploaded Map</h3>
+                  <p className="text-sm text-gray-400">{map.url}</p>
                 </div>
-                <span className={`absolute top-4 right-4 text-xs font-semibold px-2 py-1 rounded-full ${
-                  map.status === 'Critical' ? 'bg-red-500' :
-                  map.status === 'Warning' ? 'bg-yellow-500' : 'bg-green-500'
-                }`}>
-                  {map.status}
+                <span className={`absolute top-4 right-4 text-xs font-semibold px-2 py-1 rounded-full ${getRiskColor(map.riskLevel)}`}>
+                  {map.riskLevel}
                 </span>
               </div>
             ))}

@@ -13,6 +13,24 @@ const SignupPage = () => {
     location: '',
     mineCoordinates: '',
     geoTiffFiles: null,
+    // Add the AI model's required tabular data here
+    tabular_data: [{
+      "temperature": 30.0,
+      "rainfall": 120.0,
+      "soil_moisture": 0.9,
+      "vib_rms": 0.05,
+      "porepressure": 150.0,
+      "displacement": 0.5,
+      "center_lat": 45.0,
+      "center_lon": 7.0,
+      "dem_mean_elev": 500.0,
+      "dem_max_slope": 50.0,
+      "dem_mean_slope": 35.0,
+      "dem_aspect": 180.0,
+      "month": 9,
+      "day_of_week": 2,
+      "day_of_year": 256
+    }]
   });
   const router = useRouter();
 
@@ -27,13 +45,42 @@ const SignupPage = () => {
     }
   };
 
-  const handleCreateAccount = (e: React.FormEvent) => {
+  const handleCreateAccount = async (e: React.FormEvent) => {
+    console.log('Sending signup request to backend...');
     e.preventDefault();
-    // Here you would handle account creation, including file upload
-    console.log('Creating account with:', formData);
 
-    // On successful sign-up, redirect to the dashboard
-    router.push('/dashboard');
+    const form = new FormData();
+    form.append('fullName', formData.fullName);
+    form.append('email', formData.email);
+    form.append('password', formData.password);
+    form.append('location', formData.location);
+    form.append('mineCoordinates', formData.mineCoordinates);
+    form.append('tabular_data', JSON.stringify(formData.tabular_data));
+
+    // Append each file to the form data
+    if (formData.geoTiffFiles) {
+      for (let i = 0; i < formData.geoTiffFiles.length; i++) {
+        form.append('geoTiffFiles', formData.geoTiffFiles[i]);
+      }
+    }
+
+    try {
+      const response = await fetch('http://localhost:8001/api/signup', {
+        method: 'POST',
+        body: form,
+      });
+
+      if (response.ok) {
+        console.log('Account created successfully!');
+        router.push('/login');
+      } else {
+        const data = await response.json();
+        alert(data.message || 'Signup failed.');
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      alert('An error occurred. Please try again.');
+    }
   };
 
   return (

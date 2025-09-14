@@ -10,15 +10,38 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const router = useRouter();
 
-  const handleSignIn = (e: React.FormEvent) => {
+ const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would handle authentication, e.g., with an API call
-    console.log('Signing in with:', { email, password });
-    
-    // On successful login, redirect to the dashboard
-    router.push('/dashboard');
-  };
+    console.log('Attempting to send login request...');
+    try {
+        const response = await fetch('http://localhost:8001/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password }),
+        });
+        
+        if (!response.ok) {
+            // Check if the response body is valid JSON before trying to parse it
+            const text = await response.text();
+            let errorMessage = 'Login failed.';
+            try {
+                const errorData = JSON.parse(text);
+                errorMessage = errorData.message || errorMessage;
+            } catch {
+                errorMessage = text || errorMessage;
+            }
+            throw new Error(errorMessage);
+        }
 
+        const data = await response.json();
+        console.log('Login successful:', data.userId);
+        router.push('/dashboard');
+
+    } catch (error: any) {
+        console.error('Login error:', error);
+        alert(error.message);
+    }
+};
   return (
     <div className="bg-[#1e293b] text-white min-h-screen flex flex-col items-center justify-center py-12 px-4">
       <div className="text-center mb-8">
