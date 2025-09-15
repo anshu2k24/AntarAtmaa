@@ -1,167 +1,181 @@
 'use client';
 
-import { useState } from 'react';
-import { FaLock, FaUpload } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { FaLock } from 'react-icons/fa';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-const SignupPage = () => {
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-    location: '',
-    mineCoordinates: '',
-    geoTiffFiles: null,
-  });
+// Initial state objects matching your MongoDB schema
+const defaultOrg = {
+  name: '',
+  email: '',
+  contact: '',
+  registeredAddress: {
+    street: '',
+    city: '',
+    state: '',
+    zip: '',
+    country: '',
+  },
+  corporationIdentificationNumber: '',
+  registrationType: '',
+};
+const defaultSite = {
+  name: '',
+  location: '',
+  coordinates: {
+    latitude: '',
+    longitude: '',
+  },
+  businessProofLicense: '',
+  demTiff: '',
+};
+const defaultEmp = {
+  name: '',
+  email: '',
+  designation: '',
+  password: '',
+};
+
+export default function SignupPage() {
+  const [organizationData, setOrganizationData] = useState(defaultOrg);
+  const [siteData, setSiteData] = useState(defaultSite);
+  const [employeeData, setEmployeeData] = useState(defaultEmp);
   const router = useRouter();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Organization change
+  const handleOrganizationChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFormData((prevData) => ({ ...prevData, geoTiffFiles: e.target.files }));
+    if (['street', 'city', 'state', 'zip', 'country'].includes(name)) {
+      setOrganizationData(prev => ({
+        ...prev,
+        registeredAddress: { ...prev.registeredAddress, [name]: value },
+      }));
+    } else {
+      setOrganizationData(prev => ({
+        ...prev,
+        [name]: value,
+      }));
     }
   };
 
-  const handleCreateAccount = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Here you would handle account creation, including file upload
-    console.log('Creating account with:', formData);
+  // Site change
+  const handleSiteChange = (e) => {
+    const { name, value } = e.target;
+    if (['latitude', 'longitude'].includes(name)) {
+      setSiteData(prev => ({
+        ...prev,
+        coordinates: { ...prev.coordinates, [name]: value },
+      }));
+    } else {
+      setSiteData(prev => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
 
-    // On successful sign-up, redirect to the dashboard
-    router.push('/dashboard');
+  // Employee change
+  const handleEmployeeChange = (e) => {
+    const { name, value } = e.target;
+    setEmployeeData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // Submit handler
+  const handleCreateAccount = async (e) => {
+    e.preventDefault();
+    try {
+      await fetch('/api/organisation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          organizationData,
+          siteData: {
+            ...siteData,
+            coordinates: {
+              latitude: Number(siteData.coordinates.latitude),
+              longitude: Number(siteData.coordinates.longitude),
+            },
+          },
+          employeeData,
+        }),
+      });
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Failed to create account:', error);
+    }
   };
 
   return (
-    <div className="bg-[#1e293b] text-white min-h-screen flex flex-col items-center justify-center py-12 px-4">
+    <form
+      onSubmit={handleCreateAccount}
+      autoComplete="off"
+      className="bg-[#1e293b] text-white min-h-screen flex flex-col items-center justify-center py-12 px-4"
+    >
       <div className="text-center mb-8">
         <FaLock className="h-12 w-12 text-blue-500 mx-auto mb-4" />
-        <h1 className="text-3xl font-bold">Create Account</h1>
-        <p className="text-gray-400 mt-2">Join us to protect your mining operations</p>
+        <h1 className="text-3xl font-bold">Signup Portal</h1>
+        <p className="text-gray-400 mt-2">Fill in details for Organization, Site & Employee</p>
       </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-7xl">
+        {/* Organization form */}
+        <div className="bg-[#2a3648] p-8 md:p-12 rounded-xl shadow-lg w-full border border-gray-700">
+          <h2 className="text-xl font-bold mb-6 text-center">Organization Info</h2>
+          <div className="space-y-4">
+            <input name="name" placeholder="Organisation Name" value={organizationData.name} onChange={handleOrganizationChange} className="w-full px-4 py-3 bg-[#1e293b] rounded-lg border border-gray-600 text-white" />
+            <input name="email" type="email" placeholder="Email Address" value={organizationData.email} onChange={handleOrganizationChange} className="w-full px-4 py-3 bg-[#1e293b] rounded-lg border border-gray-600 text-white" />
+            <input name="contact" placeholder="Contact" value={organizationData.contact} onChange={handleOrganizationChange} className="w-full px-4 py-3 bg-[#1e293b] rounded-lg border border-gray-600 text-white" />
+            <input name="street" placeholder="Street" value={organizationData.registeredAddress.street} onChange={handleOrganizationChange} className="w-full px-4 py-3 bg-[#1e293b] rounded-lg border border-gray-600 text-white" />
+            <input name="city" placeholder="City" value={organizationData.registeredAddress.city} onChange={handleOrganizationChange} className="w-full px-4 py-3 bg-[#1e293b] rounded-lg border border-gray-600 text-white" />
+            <input name="state" placeholder="State" value={organizationData.registeredAddress.state} onChange={handleOrganizationChange} className="w-full px-4 py-3 bg-[#1e293b] rounded-lg border border-gray-600 text-white" />
+            <input name="zip" placeholder="ZIP Code" value={organizationData.registeredAddress.zip} onChange={handleOrganizationChange} className="w-full px-4 py-3 bg-[#1e293b] rounded-lg border border-gray-600 text-white" />
+            <input name="country" placeholder="Country" value={organizationData.registeredAddress.country} onChange={handleOrganizationChange} className="w-full px-4 py-3 bg-[#1e293b] rounded-lg border border-gray-600 text-white" />
+            <input name="corporationIdentificationNumber" placeholder="CIN Number" value={organizationData.corporationIdentificationNumber} onChange={handleOrganizationChange} className="w-full px-4 py-3 bg-[#1e293b] rounded-lg border border-gray-600 text-white" />
+            <input name="registrationType" placeholder="Registration Type" value={organizationData.registrationType} onChange={handleOrganizationChange} className="w-full px-4 py-3 bg-[#1e293b] rounded-lg border border-gray-600 text-white" />
+          </div>
+        </div>
 
-      <div className="bg-[#2a3648] p-8 md:p-12 rounded-xl shadow-lg w-full max-w-lg border border-gray-700">
-        <form onSubmit={handleCreateAccount} className="space-y-6">
-          <div>
-            <label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-1">
-              Full Name
-            </label>
-            <input
-              id="fullName"
-              name="fullName"
-              type="text"
-              placeholder="Enter your full name"
-              value={formData.fullName}
-              onChange={handleInputChange}
-              className="w-full px-4 py-3 bg-[#1e293b] rounded-lg text-white border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors"
-              required
-            />
+        {/* Site form */}
+        <div className="bg-[#2a3648] p-8 md:p-12 rounded-xl shadow-lg w-full border border-gray-700">
+          <h2 className="text-xl font-bold mb-6 text-center">Site Info</h2>
+          <div className="space-y-4">
+            <input name="name" placeholder="Site Name" value={siteData.name} onChange={handleSiteChange} className="w-full px-4 py-3 bg-[#1e293b] rounded-lg border border-gray-600 text-white" />
+            <input name="location" placeholder="Location" value={siteData.location} onChange={handleSiteChange} className="w-full px-4 py-3 bg-[#1e293b] rounded-lg border border-gray-600 text-white" />
+            <input name="latitude" type="number" step="any" placeholder="Latitude" value={siteData.coordinates.latitude} onChange={handleSiteChange} className="w-full px-4 py-3 bg-[#1e293b] rounded-lg border border-gray-600 text-white" />
+            <input name="longitude" type="number" step="any" placeholder="Longitude" value={siteData.coordinates.longitude} onChange={handleSiteChange} className="w-full px-4 py-3 bg-[#1e293b] rounded-lg border border-gray-600 text-white" />
+            <input name="businessProofLicense" type="url" placeholder="Business Proof License (URL)" value={siteData.businessProofLicense} onChange={handleSiteChange} className="w-full px-4 py-3 bg-[#1e293b] rounded-lg border border-gray-600 text-white" />
+            <input name="demTiff" type="url" placeholder="DEM TIFF (URL)" value={siteData.demTiff} onChange={handleSiteChange} className="w-full px-4 py-3 bg-[#1e293b] rounded-lg border border-gray-600 text-white" />
           </div>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
-              Email Address
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={handleInputChange}
-              className="w-full px-4 py-3 bg-[#1e293b] rounded-lg text-white border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors"
-              required
-            />
+        </div>
+
+        {/* Employee form */}
+        <div className="bg-[#2a3648] p-8 md:p-12 rounded-xl shadow-lg w-full border border-gray-700">
+          <h2 className="text-xl font-bold mb-6 text-center">Employee Info</h2>
+          <div className="space-y-4">
+            <input name="name" placeholder="Employee Name" value={employeeData.name} onChange={handleEmployeeChange} className="w-full px-4 py-3 bg-[#1e293b] rounded-lg border border-gray-600 text-white" />
+            <input name="email" type="email" placeholder="Email Address" value={employeeData.email} onChange={handleEmployeeChange} className="w-full px-4 py-3 bg-[#1e293b] rounded-lg border border-gray-600 text-white" />
+            <input name="designation" placeholder="Designation" value={employeeData.designation} onChange={handleEmployeeChange} className="w-full px-4 py-3 bg-[#1e293b] rounded-lg border border-gray-600 text-white" />
+            <input name="password" type="password" placeholder="Password" value={employeeData.password} onChange={handleEmployeeChange} className="w-full px-4 py-3 bg-[#1e293b] rounded-lg border border-gray-600 text-white" />
           </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
-              Password
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="Create a strong password"
-              value={formData.password}
-              onChange={handleInputChange}
-              className="w-full px-4 py-3 bg-[#1e293b] rounded-lg text-white border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="location" className="block text-sm font-medium text-gray-300 mb-1">
-              Location
-            </label>
-            <input
-              id="location"
-              name="location"
-              type="text"
-              placeholder="Enter your location"
-              value={formData.location}
-              onChange={handleInputChange}
-              className="w-full px-4 py-3 bg-[#1e293b] rounded-lg text-white border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors"
-            />
-          </div>
-          <div>
-            <label htmlFor="mineCoordinates" className="block text-sm font-medium text-gray-300 mb-1">
-              Mine Coordinates
-            </label>
-            <input
-              id="mineCoordinates"
-              name="mineCoordinates"
-              type="text"
-              placeholder="e.g., 45.7112° N, 74.2097° W"
-              value={formData.mineCoordinates}
-              onChange={handleInputChange}
-              className="w-full px-4 py-3 bg-[#1e293b] rounded-lg text-white border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Geo-TIFF Images
-            </label>
-            <div className="bg-[#1e293b] rounded-lg border border-dashed border-gray-600 p-6 text-center">
-              <FaUpload className="mx-auto h-8 w-8 text-gray-500 mb-3" />
-              <p className="text-sm text-gray-400">Upload multiple Geo-TIFF images for risk mapping.</p>
-              <label htmlFor="geoTiffFiles" className="cursor-pointer text-blue-500 hover:text-blue-400 font-semibold mt-2 block">
-                Choose Files
-              </label>
-              <input
-                id="geoTiffFiles"
-                name="geoTiffFiles"
-                type="file"
-                multiple
-                onChange={handleFileChange}
-                className="hidden"
-              />
-              {formData.geoTiffFiles && (
-                <p className="text-xs text-gray-500 mt-2">
-                  Selected: {Array.from(formData.geoTiffFiles).map(file => file.name).join(', ')}
-                </p>
-              )}
-            </div>
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors"
-          >
-            Create Account
-          </button>
-        </form>
-        <div className="text-center mt-6 text-sm text-gray-400">
+        </div>
+      </div>
+      <div className="mt-10 text-center">
+        <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-12 rounded-lg transition-colors">
+          Create Account
+        </button>
+        <div className="text-sm text-gray-400 mt-6">
           <p>
             Already have an account?{' '}
-            <Link href="/login" className="text-blue-500 hover:text-blue-400 font-semibold transition-colors">
-              Sign in here
-            </Link>
+            <Link href="/login" className="text-blue-500 hover:text-blue-400 font-semibold transition-colors">Sign in here</Link>
           </p>
         </div>
       </div>
-    </div>
+    </form>
   );
-};
+}
 
-export default SignupPage;
+
+
