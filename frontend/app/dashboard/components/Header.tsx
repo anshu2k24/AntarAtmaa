@@ -1,25 +1,39 @@
-'use client';
+import Image from "next/image";
+import { FaUserCircle, FaSignOutAlt, FaBars } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
-import { FaUserCircle, FaSignOutAlt, FaBars } from 'react-icons/fa';
-import { useRouter } from 'next/navigation';
+interface HeaderProps {
+  isSidebarCollapsed: boolean;
+}
 
-const Header = () => {
+const Header = ({ isSidebarCollapsed }: HeaderProps) => {
   const router = useRouter();
 
   const handleLogout = () => {
-    // Implement your logout logic here (e.g., clearing tokens)
-    console.log('User logged out');
-    // Redirect to the landing page
-    router.push('/');
+    console.log("User logged out");
+    router.push("/");
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 bg-[#1e293b] text-white p-4 flex items-center justify-between shadow-md">
+    <header className="fixed top-0 left-0 right-0 z-40 bg-[#1e293b] text-white p-4 flex items-center justify-between shadow-md transition-all duration-300">
       <div className="flex items-center space-x-4">
         <button className="lg:hidden text-gray-400">
           <FaBars className="h-6 w-6" />
         </button>
-        <span className="text-xl font-bold text-white">DisasterAI</span>
+        <span
+          className={`transition-all duration-300 ${
+            isSidebarCollapsed ? "ml-28" : "ml-72"
+          }`}
+        >
+          <Image
+            src="/logo.png"
+            alt="DisasterAI Logo"
+            width={200}
+            height={100}
+            className="object-contain max-h-12 w-auto"
+            priority
+          />
+        </span>
       </div>
       <div className="flex items-center space-x-4">
         <div className="flex items-center space-x-2">

@@ -1,120 +1,152 @@
-'use client';
+"use client";
 
-import { FaSun, FaCloud, FaBolt, FaTint, FaWind, FaThermometerHalf, FaSyncAlt } from 'react-icons/fa';
+import { useEffect, useState } from "react";
+import { FaTint, FaWind, FaThermometerHalf, FaCloudSun } from "react-icons/fa";
 
 const WeatherPage = () => {
+  const [weather, setWeather] = useState<any>(null);
+  const [forecast, setForecast] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_KEY;
+  const CITY = "Bangalore";
+
+  useEffect(() => {
+    const fetchWeather = async () => {
+      try {
+        setLoading(true);
+
+        // Current Weather
+        const res = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?q=${CITY}&units=metric&appid=${API_KEY}`
+        );
+        const currentData = await res.json();
+
+        // Forecast (5 days / 3-hour intervals)
+        const res2 = await fetch(
+          `https://api.openweathermap.org/data/2.5/forecast?q=${CITY}&units=metric&appid=${API_KEY}`
+        );
+        const forecastData = await res2.json();
+
+        setWeather(currentData);
+        setForecast(forecastData.list || []);
+      } catch (err) {
+        console.error("Error fetching weather:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWeather();
+  }, []);
+
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white">Weather & Forecasts</h1>
-          <p className="text-gray-400 mt-1">Real-time weather monitoring and risk assessment</p>
-        </div>
-        <button className="flex items-center space-x-2 px-4 py-2 rounded-lg border border-gray-500 text-gray-400 hover:bg-gray-700 transition-colors">
-          <FaSyncAlt />
-          <span>Refresh</span>
-        </button>
-      </div>
+    <div className="space-y-8 text-white p-4 md:p-8">
+      {/* Live Weather Card */}
+      <div className="relative p-8 rounded-xl shadow-2xl overflow-hidden bg-gradient-to-r from-[#1f2a40] via-[#283149] to-[#1b2540]">
+        {/* Decorative Background Icons */}
+        <FaCloudSun className="absolute top-4 left-4 text-white/10 text-[80px] rotate-12" />
+        <FaCloudSun className="absolute bottom-0 right-0 text-white/5 text-[100px] -rotate-6" />
 
-      {/* Current Conditions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-[#1e293b] p-6 rounded-lg shadow-lg space-y-4">
-          <h2 className="text-xl font-semibold">Current Conditions</h2>
-          <p className="text-sm text-gray-400">View live weather station</p>
-          <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-6 md:space-y-0">
+          {/* Main Weather Info */}
+          <div className="flex items-center space-x-6">
+            <img
+              src={`https://openweathermap.org/img/wn/${
+                weather?.weather?.[0]?.icon || "01d"
+              }@4x.png`}
+              alt="weather icon"
+              className="w-32 h-32"
+            />
             <div>
-              <p className="text-5xl font-bold text-blue-500">18.5°C</p>
-              <p className="text-lg text-gray-400">Partly Cloudy</p>
-            </div>
-            <FaCloud className="h-24 w-24 text-gray-500" />
-          </div>
-          <div className="grid grid-cols-2 gap-4 text-sm text-gray-400 mt-4">
-            <div className="flex items-center space-x-2">
-              <FaTint className="h-4 w-4 text-gray-500" />
-              <span>Humidity: 87%</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <FaWind className="h-4 w-4 text-gray-500" />
-              <span>Wind: 12.3 km/h</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <FaThermometerHalf className="h-4 w-4 text-gray-500" />
-              <span>Pressure: 1012 mb</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <FaSyncAlt className="h-4 w-4 text-gray-500" />
-              <span>Visibility: 8.1 km</span>
+              {loading ? (
+                <p className="text-gray-400 text-lg">Loading...</p>
+              ) : weather ? (
+                <>
+                  <p className="text-6xl font-bold text-blue-300">
+                    {Math.round(weather.main.temp)}°C
+                  </p>
+                  <p className="text-xl capitalize text-gray-200">
+                    {weather.weather[0].description}
+                  </p>
+                  <p className="mt-2 text-gray-400 font-medium text-sm">
+                    {CITY}, {weather.sys?.country}
+                  </p>
+                </>
+              ) : (
+                <p className="text-red-400">No data available</p>
+              )}
             </div>
           </div>
-        </div>
-        
-        {/* Weather Alerts */}
-        <div className="bg-[#1e293b] p-6 rounded-lg shadow-lg space-y-4">
-          <h2 className="text-xl font-semibold">Weather Alerts & Risk Assessment</h2>
-          <p className="text-sm text-gray-400">Impact on mining operations and safety</p>
-          <div className="bg-yellow-800/50 p-4 rounded-lg border border-yellow-700 flex items-center justify-between">
-            <p className="text-yellow-400 text-sm">Heavy rainfall expected Thursday. Friday increased rockfall risk.</p>
-            <span className="text-red-500 text-sm">High</span>
-          </div>
-          <div className="bg-green-800/50 p-4 rounded-lg border border-green-700 flex items-center justify-between">
-            <p className="text-green-400 text-sm">UV levels moderate. Safe for outdoor operations.</p>
-            <span className="text-blue-500 text-sm">Low</span>
-          </div>
-          <div className="grid grid-cols-3 gap-4 text-center mt-6">
-            <div className="bg-[#2a3648] p-4 rounded-lg">
-              <FaThermometerHalf className="mx-auto h-8 w-8 text-green-500 mb-2" />
-              <p className="text-sm">Optimal</p>
-              <p className="text-xs text-gray-500">Temperature Range</p>
+
+          {/* Weather Details */}
+          {!loading && weather && (
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="bg-white/10 p-4 rounded-lg backdrop-blur-md">
+                <FaTint className="mx-auto mb-2 text-white/80" />
+                <p className="text-lg font-semibold text-gray-200">
+                  {weather.main.humidity}%
+                </p>
+                <p className="text-sm text-gray-400">Humidity</p>
+              </div>
+              <div className="bg-white/10 p-4 rounded-lg backdrop-blur-md">
+                <FaWind className="mx-auto mb-2 text-white/80" />
+                <p className="text-lg font-semibold text-gray-200">
+                  {weather.wind.speed} m/s
+                </p>
+                <p className="text-sm text-gray-400">Wind</p>
+              </div>
+              <div className="bg-white/10 p-4 rounded-lg backdrop-blur-md">
+                <FaThermometerHalf className="mx-auto mb-2 text-white/80" />
+                <p className="text-lg font-semibold text-gray-200">
+                  {weather.main.pressure} hPa
+                </p>
+                <p className="text-sm text-gray-400">Pressure</p>
+              </div>
             </div>
-            <div className="bg-[#2a3648] p-4 rounded-lg">
-              <FaWind className="mx-auto h-8 w-8 text-green-500 mb-2" />
-              <p className="text-sm">Safe</p>
-              <p className="text-xs text-gray-500">Wind Conditions</p>
-            </div>
-            <div className="bg-[#2a3648] p-4 rounded-lg">
-              <FaTint className="mx-auto h-8 w-8 text-yellow-500 mb-2" />
-              <p className="text-sm">Moderate</p>
-              <p className="text-xs text-gray-500">Rain Risk</p>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* 7-Day Forecast */}
+      {/* 5-Day Forecast */}
       <div className="bg-[#1e293b] p-6 rounded-lg shadow-lg">
-        <h2 className="text-xl font-semibold mb-4">7-Day Forecast & Risk Analysis</h2>
-        <p className="text-gray-400 text-sm">Detailed weather updates with operational impact assessment</p>
-        <div className="grid grid-cols-7 gap-4 text-center mt-4">
-          {/* Day Card */}
-          <div className="bg-[#2a3648] p-4 rounded-lg space-y-2">
-            <p className="font-semibold">Today</p>
-            <FaCloud className="mx-auto h-12 w-12 text-gray-400" />
-            <p className="text-lg font-bold">20°</p>
-            <p className="text-sm text-gray-400">Cloudy</p>
-            <div className="text-xs text-gray-500">
-              <p>Rain: 20%</p>
-              <span className="bg-green-500 text-white px-2 py-0.5 rounded-full text-[10px]">Low Risk</span>
-            </div>
-          </div>
-          {/* ... Other days can be similar components */}
-        </div>
-      </div>
+        <h2 className="text-xl font-semibold mb-4">5-Day Forecast</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 text-center">
+          {forecast.length > 0 ? (
+            forecast.map((f, idx) => {
+              const date = new Date(f.dt * 1000);
+              const day = date.toLocaleDateString("en-US", {
+                weekday: "short",
+              });
+              const time = date.toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "2-digit",
+              });
 
-      {/* Rainfall & Temperature Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-[#1e293b] p-6 rounded-lg shadow-lg">
-          <h2 className="text-xl font-semibold">Rainfall Trends</h2>
-          <p className="text-gray-400 text-sm">24-hour precipitation monitoring</p>
-          <div className="h-48 mt-4 bg-gray-800 rounded-lg flex items-center justify-center">
-            <span className="text-gray-500">Chart Placeholder</span>
-          </div>
-        </div>
-        <div className="bg-[#1e293b] p-6 rounded-lg shadow-lg">
-          <h2 className="text-xl font-semibold">Temperature & Humidity</h2>
-          <p className="text-gray-400 text-sm">Environmental parameter correlation</p>
-          <div className="h-48 mt-4 bg-gray-800 rounded-lg flex items-center justify-center">
-            <span className="text-gray-500">Chart Placeholder</span>
-          </div>
+              return (
+                <div
+                  key={idx}
+                  className="bg-[#2a3648] p-4 rounded-lg space-y-2"
+                >
+                  <p className="font-semibold text-sm">{day}</p>
+                  <p className="text-xs text-gray-400">{time}</p>
+                  <img
+                    src={`https://openweathermap.org/img/wn/${f.weather[0].icon}@2x.png`}
+                    alt="icon"
+                    className="mx-auto h-12 w-12"
+                  />
+                  <p className="text-lg font-bold">
+                    {Math.round(f.main.temp)}°C
+                  </p>
+                  <p className="text-sm text-gray-400 capitalize">
+                    {f.weather[0].description}
+                  </p>
+                </div>
+              );
+            })
+          ) : (
+            <p className="text-gray-400">No forecast available</p>
+          )}
         </div>
       </div>
     </div>

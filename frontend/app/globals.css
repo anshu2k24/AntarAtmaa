@@ -19,6 +19,24 @@
   }
 }
 
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* make sure sections are not hidden behind fixed navbar */
+section {
+  scroll-margin-top: 80px; /* adjust to match your navbar height */
+}
+
+.animate-float {
+  animation: float 2s ease-in-out infinite;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
