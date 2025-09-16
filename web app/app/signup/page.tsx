@@ -109,9 +109,9 @@ export default function SignupPage() {
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) {
-        throw new Error(`HTTP error! Status: ${res.status}`);
-      }
+          if (!res.ok) {
+            throw new Error(`HTTP error! Status: ${res.status}`);
+          }
 
       router.push('/dashboard');
     } catch (error) {
