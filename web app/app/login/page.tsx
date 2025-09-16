@@ -10,38 +10,47 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const router = useRouter();
 
- const handleSignIn = async (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Attempting to send login request...');
+
     try {
-        const response = await fetch('http://localhost:8001/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
-        });
-        
-        if (!response.ok) {
-            // Check if the response body is valid JSON before trying to parse it
-            const text = await response.text();
-            let errorMessage = 'Login failed.';
-            try {
-                const errorData = JSON.parse(text);
-                errorMessage = errorData.message || errorMessage;
-            } catch {
-                errorMessage = text || errorMessage;
-            }
-            throw new Error(errorMessage);
+      const response = await fetch('http://localhost:3000/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        let errorMessage = 'Login failed.';
+        try {
+          const errorData = JSON.parse(text);
+          errorMessage = errorData.message || errorMessage;
+        } catch {
+          errorMessage = text || errorMessage;
         }
+        throw new Error(errorMessage);
+      }
 
-        const data = await response.json();
-        console.log('Login successful:', data.userId);
-        router.push('/dashboard');
+      const data = await response.json();
+      console.log('Login successful:', data);
 
+      // Save IDs in localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('employeeId', data.employeeId);
+        localStorage.setItem('organizationId', data.organizationId);
+        localStorage.setItem('siteId', data.siteId);
+      }
+
+      // Redirect
+      router.push('/dashboard');
     } catch (error: any) {
-        console.error('Login error:', error);
-        alert(error.message);
+      console.error('Login error:', error);
+      alert(error.message);
     }
-};
+  };
+
   return (
     <div className="bg-[#1e293b] text-white min-h-screen flex flex-col items-center justify-center py-12 px-4">
       <div className="text-center mb-8">
@@ -90,7 +99,10 @@ const LoginPage = () => {
         <div className="text-center mt-6 text-sm text-gray-400">
           <p>
             Don&apos;t have an account?{' '}
-            <Link href="/signup" className="text-blue-500 hover:text-blue-400 font-semibold transition-colors">
+            <Link
+              href="/signup"
+              className="text-blue-500 hover:text-blue-400 font-semibold transition-colors"
+            >
               Sign up here
             </Link>
           </p>

@@ -20,18 +20,23 @@ async function dbConnect() {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
+      dbName: 'minesdb', // optional
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      return mongoose;
-    });
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => mongoose);
   }
 
   try {
     cached.conn = await cached.promise;
   } catch (e) {
+    console.error('MongoDB connection error:', e);
     cached.promise = null;
     throw e;
+  }
+
+  if (process.env.NODE_ENV === 'development') {
+    mongoose.connection.on('connected', () => console.log('✅ MongoDB connected'));
+    mongoose.connection.on('error', (err) => console.error('❌ MongoDB error:', err));
   }
 
   return cached.conn;
