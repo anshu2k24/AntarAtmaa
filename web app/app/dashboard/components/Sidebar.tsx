@@ -20,7 +20,7 @@ interface SidebarProps {
 }
 
 const navItems = [
-  { href: "/dashboard", icon: FaTachometerAlt, label: "Dashboard" },
+  { href: "/dashboard/detailspage", icon: FaTachometerAlt, label: "Details-Page" },
   { href: "/dashboard/risk-maps", icon: FaMapMarkedAlt, label: "Risk Maps" },
   { href: "/dashboard/sensor-data", icon: FaCubes, label: "Sensor Data" },
   {
@@ -32,16 +32,6 @@ const navItems = [
     href: "/dashboard/alerts-notifications",
     icon: FaBell,
     label: "Alerts & Notifications",
-  },
-  {
-    href: "/dashboard/sos-emergency",
-    icon: FaExclamationTriangle,
-    label: "SOS / Emergency",
-  },
-  {
-    href: "/dashboard/historical-trends",
-    icon: FaChartLine,
-    label: "Historical Trends",
   },
 ];
 

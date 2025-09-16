@@ -3,7 +3,7 @@ import { FaUserFriends, FaExclamationCircle, FaSignal } from 'react-icons/fa';
 const DashboardPage = () => {
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold text-white">Mine Safety Dashboard</h1>
+      <h1 className="text-3xl font-bold text-white mt-3 ml-4">Mine Safety Dashboard</h1>
       <p className="text-gray-400">Real-time monitoring and AI-powered risk prediction for optimal mine safety management.</p>
 
       {/* Stats Cards */}

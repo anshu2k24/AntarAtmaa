@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FaSlidersH } from "react-icons/fa";
+import { FaSlidersH, FaExclamationCircle } from "react-icons/fa";
 
 const AlertsPage = () => {
   // Alert Thresholds State
@@ -171,52 +171,75 @@ const AlertsPage = () => {
             ))}
           </div>
         </div>
-      </div>
 
-      {/* Alert Timeline Section */}
-      <div className="bg-[#1e293b] p-6 rounded-lg shadow-lg">
-        <h2 className="text-xl font-semibold mb-4">Alert Timeline</h2>
-        <p className="text-gray-400 text-sm">
-          Chronological view of all system alerts
-        </p>
-        <div className="mt-4 space-y-4">
-          {[
-            {
-              title: "Slope Instability Detected",
-              desc: "Significant movement detected in Sector A7. Immediate evacuation recommended.",
-              time: "2 minutes ago",
-              color: "red-500",
-            },
-            {
-              title: "Weather Alert",
-              desc: "Heavy rainfall predicted for next 48 hours. Monitor all zones closely.",
-              time: "15 minutes ago",
-              color: "yellow-500",
-            },
-            {
-              title: "Sensor Calibration",
-              desc: "Routine calibration completed for all displacement sensors in Zone C.",
-              time: "1 hour ago",
-              color: "green-500",
-            },
-            {
-              title: "Vibration Threshold Exceeded",
-              desc: "Sudden spike in vibration patterns detected in Zone B3. Investigation required.",
-              time: "2 hours ago",
-              color: "red-500",
-            },
-          ].map((alert, idx) => (
-            <div
-              key={idx}
-              className={`bg-[#2a3648] p-4 rounded-lg border-l-4 border-${alert.color} flex justify-between items-start`}
-            >
-              <div>
-                <p className="font-semibold text-white">{alert.title}</p>
-                <p className="text-sm text-gray-400 mt-1">{alert.desc}</p>
+        {/* Emergency Activation System */}
+        <div className="bg-[#1e293b] p-15 rounded-lg shadow-lg text-center flex flex-col items-center justify-center">
+                <h2 className="text-xl font-semibold mb-4 text-red-500">
+                  Emergency Activation System:
+                </h2>
+                <p className="text-sm text-gray-400 mb-6">
+                  Click the button below to activate emergency response protocols
+                </p>
+                <button className="relative w-48 h-48 rounded-full bg-blue-600 hover:bg-blue-700 transition-colors flex flex-col items-center justify-center mx-auto text-white">
+                  <FaExclamationCircle className="h-16 w-16 mb-2" />
+                  <span className="text-2xl font-bold">EMERGENCY</span>
+                  <span className="text-lg">SOS</span>
+                  <span className="absolute h-full w-full rounded-full border-2 border-blue-400 animate-ping"></span>
+                </button>
+                <p className="text-xs text-gray-500 mt-4 max-w-sm mx-auto">
+                  This will immediately notify all emergency contacts and activate
+                  evacuation protocols. Use only in case of actual emergency.
+                </p>
               </div>
-              <span className="text-xs text-gray-500">{alert.time}</span>
+
+               {/* Emergency Protocols */}
+        <div className="bg-[#1e293b] p-6 rounded-lg shadow-lg">
+          <h2 className="text-xl font-semibold">Emergency Protocols</h2>
+          <p className="text-sm text-gray-400 mb-4">
+            Standard operating procedures for emergencies
+          </p>
+          <div className="space-y-4">
+            <div className="bg-red-900/40 p-4 rounded-lg border-l-4 border-red-500">
+              <h3 className="text-lg font-semibold text-red-400">
+                Level 1: Critical Emergency
+              </h3>
+              <ul className="list-disc list-inside text-sm text-gray-400 mt-2">
+                <li>Immediate site evacuation</li>
+                <li>Emergency service notification</li>
+                <li>Activate SOS alarm systems</li>
+              </ul>
             </div>
-          ))}
+            <div className="bg-orange-900/40 p-4 rounded-lg border-l-4 border-orange-500">
+              <h3 className="text-lg font-semibold text-orange-400">
+                Level 2: Major Emergency
+              </h3>
+              <ul className="list-disc list-inside text-sm text-gray-400 mt-2">
+                <li>Partial site evacuation</li>
+                <li>First aid and rescue teams deployed</li>
+                <li>Alert nearby facilities</li>
+              </ul>
+            </div>
+            <div className="bg-yellow-900/40 p-4 rounded-lg border-l-4 border-yellow-500">
+              <h3 className="text-lg font-semibold text-yellow-400">
+                Level 3: Moderate Incident
+              </h3>
+              <ul className="list-disc list-inside text-sm text-gray-400 mt-2">
+                <li>Monitor situation continuously</li>
+                <li>Contain affected areas</li>
+                <li>Log incident details for review</li>
+              </ul>
+            </div>
+            <div className="bg-green-900/40 p-4 rounded-lg border-l-4 border-green-500">
+              <h3 className="text-lg font-semibold text-green-400">
+                Level 4: Minor Alert
+              </h3>
+              <ul className="list-disc list-inside text-sm text-gray-400 mt-2">
+                <li>Raise awareness among staff</li>
+                <li>No evacuation needed</li>
+                <li>Continue normal monitoring</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
