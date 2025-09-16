@@ -1,76 +1,93 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { FaTint, FaWind, FaThermometerHalf, FaCloudSun } from "react-icons/fa";
+import { useEffect, useState, useCallback } from "react";
+import { FaTint, FaWind, FaThermometerHalf, FaCloudSun, FaSyncAlt } from "react-icons/fa";
 
 const WeatherPage = () => {
   const [weather, setWeather] = useState<any>(null);
   const [forecast, setForecast] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_KEY;
-  const CITY = "Bangalore";
+  // Donimalai Mines Coordinates
+  const LAT = 15.0706;
+  const LON = 76.6173;
+
+  const fetchWeather = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Current Weather + Forecast from Open-Meteo
+      const res = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current_weather=true&hourly=temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m`
+      );
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.reason || "Failed to fetch weather");
+      }
+
+      setWeather(data.current_weather);
+      setForecast(
+        data.hourly?.time?.map((t: string, i: number) => ({
+          time: t,
+          temp: data.hourly.temperature_2m[i],
+          humidity: data.hourly.relative_humidity_2m[i],
+          pressure: data.hourly.pressure_msl[i],
+          wind: data.hourly.wind_speed_10m[i],
+        })) || []
+      );
+    } catch (err: any) {
+      console.error("Error fetching weather:", err);
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchWeather = async () => {
-      try {
-        setLoading(true);
-
-        // Current Weather
-        const res = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?q=${CITY}&units=metric&appid=${API_KEY}`
-        );
-        const currentData = await res.json();
-
-        // Forecast (5 days / 3-hour intervals)
-        const res2 = await fetch(
-          `https://api.openweathermap.org/data/2.5/forecast?q=${CITY}&units=metric&appid=${API_KEY}`
-        );
-        const forecastData = await res2.json();
-
-        setWeather(currentData);
-        setForecast(forecastData.list || []);
-      } catch (err) {
-        console.error("Error fetching weather:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchWeather();
-  }, []);
+  }, [fetchWeather]);
 
   return (
     <div className="space-y-8 text-white p-4 md:p-8">
+      {/* Header with Refresh */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Weather Dashboard</h1>
+        <button
+          onClick={fetchWeather}
+          className="flex items-center space-x-2 px-4 py-2 rounded-lg border border-gray-500 text-gray-300 hover:bg-gray-700 transition-colors"
+        >
+          <FaSyncAlt />
+          <span>Refresh</span>
+        </button>
+      </div>
+
       {/* Live Weather Card */}
       <div className="relative p-8 rounded-xl shadow-2xl overflow-hidden bg-gradient-to-r from-[#1f2a40] via-[#283149] to-[#1b2540]">
-        {/* Decorative Background Icons */}
         <FaCloudSun className="absolute top-4 left-4 text-white/10 text-[80px] rotate-12" />
         <FaCloudSun className="absolute bottom-0 right-0 text-white/5 text-[100px] -rotate-6" />
 
         <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-6 md:space-y-0">
           {/* Main Weather Info */}
           <div className="flex items-center space-x-6">
-            <img
-              src={`https://openweathermap.org/img/wn/${
-                weather?.weather?.[0]?.icon || "01d"
-              }@4x.png`}
-              alt="weather icon"
-              className="w-32 h-32"
-            />
+            <FaCloudSun className="text-yellow-300 text-7xl" />
             <div>
               {loading ? (
                 <p className="text-gray-400 text-lg">Loading...</p>
+              ) : error ? (
+                <p className="text-red-400">{error}</p>
               ) : weather ? (
                 <>
                   <p className="text-6xl font-bold text-blue-300">
-                    {Math.round(weather.main.temp)}°C
+                    {Math.round(weather.temperature)}°C
                   </p>
                   <p className="text-xl capitalize text-gray-200">
-                    {weather.weather[0].description}
+                    Winds {weather.windspeed} km/h
                   </p>
                   <p className="mt-2 text-gray-400 font-medium text-sm">
-                    {CITY}, {weather.sys?.country}
+                    Donimalai Mines
                   </p>
                 </>
               ) : (
@@ -85,21 +102,21 @@ const WeatherPage = () => {
               <div className="bg-white/10 p-4 rounded-lg backdrop-blur-md">
                 <FaTint className="mx-auto mb-2 text-white/80" />
                 <p className="text-lg font-semibold text-gray-200">
-                  {weather.main.humidity}%
+                  {forecast[0]?.humidity ?? "N/A"}%
                 </p>
                 <p className="text-sm text-gray-400">Humidity</p>
               </div>
               <div className="bg-white/10 p-4 rounded-lg backdrop-blur-md">
                 <FaWind className="mx-auto mb-2 text-white/80" />
                 <p className="text-lg font-semibold text-gray-200">
-                  {weather.wind.speed} m/s
+                  {weather.windspeed ?? "N/A"} km/h
                 </p>
                 <p className="text-sm text-gray-400">Wind</p>
               </div>
               <div className="bg-white/10 p-4 rounded-lg backdrop-blur-md">
                 <FaThermometerHalf className="mx-auto mb-2 text-white/80" />
                 <p className="text-lg font-semibold text-gray-200">
-                  {weather.main.pressure} hPa
+                  {forecast[0]?.pressure ?? "N/A"} hPa
                 </p>
                 <p className="text-sm text-gray-400">Pressure</p>
               </div>
@@ -108,19 +125,15 @@ const WeatherPage = () => {
         </div>
       </div>
 
-      {/* 5-Day Forecast */}
+      {/* Forecast Grid */}
       <div className="bg-[#1e293b] p-6 rounded-lg shadow-lg">
-        <h2 className="text-xl font-semibold mb-4">5-Day Forecast</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 text-center">
+        <h2 className="text-xl font-semibold mb-4">Hourly Forecast</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 text-center">
           {forecast.length > 0 ? (
-            forecast.map((f, idx) => {
-              const date = new Date(f.dt * 1000);
-              const day = date.toLocaleDateString("en-US", {
-                weekday: "short",
-              });
-              const time = date.toLocaleTimeString("en-US", {
+            forecast.slice(0, 12).map((f, idx) => {
+              const date = new Date(f.time);
+              const hour = date.toLocaleTimeString("en-US", {
                 hour: "numeric",
-                minute: "2-digit",
               });
 
               return (
@@ -128,19 +141,10 @@ const WeatherPage = () => {
                   key={idx}
                   className="bg-[#2a3648] p-4 rounded-lg space-y-2"
                 >
-                  <p className="font-semibold text-sm">{day}</p>
-                  <p className="text-xs text-gray-400">{time}</p>
-                  <img
-                    src={`https://openweathermap.org/img/wn/${f.weather[0].icon}@2x.png`}
-                    alt="icon"
-                    className="mx-auto h-12 w-12"
-                  />
-                  <p className="text-lg font-bold">
-                    {Math.round(f.main.temp)}°C
-                  </p>
-                  <p className="text-sm text-gray-400 capitalize">
-                    {f.weather[0].description}
-                  </p>
+                  <p className="font-semibold text-sm">{hour}</p>
+                  <FaCloudSun className="mx-auto text-yellow-300 text-3xl" />
+                  <p className="text-lg font-bold">{Math.round(f.temp)}°C</p>
+                  <p className="text-sm text-gray-400">{f.humidity}% Humidity</p>
                 </div>
               );
             })
