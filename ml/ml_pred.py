@@ -2,11 +2,22 @@ import uvicorn
 import pandas as pd
 import xgboost as xgb
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi.middleware.cors import CORSMiddleware  # ✅ add this
 from ultralytics import YOLO
 from PIL import Image
 import io
 import json
+
 app = FastAPI(title="Rockfall Fusion API")
+
+# ✅ Allow CORS (frontend at :3000 can hit :8000)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # or ["http://localhost:3000"] for stricter security
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # XGBoost model
 xgb_model = xgb.XGBClassifier()
@@ -26,8 +37,8 @@ EXPECTED_COLUMNS = [
 
 @app.post("/rockfall/predict")
 async def fusion_predict(
-    tabular_data: str = Form(...),  # receive as string
-    file: UploadFile = File(...)
+    tabular_data: str = Form(...),
+    file: UploadFile = File(None)
 ):
     try:
         data_list = json.loads(tabular_data)
@@ -36,27 +47,28 @@ async def fusion_predict(
 
         rockfall_probs = xgb_model.predict_proba(df)[:, 1].tolist()
 
-        contents = await file.read()
-        img = Image.open(io.BytesIO(contents))
-        results = yolo_model.predict(img, conf=0.25)
+        yolo_score, detections = 0.0, []
+        if file is not None:
+            contents = await file.read()
+            img = Image.open(io.BytesIO(contents))
+            results = yolo_model.predict(img, conf=0.25)
 
-        yolo_score = 0.0
-        detections = []
+            for r in results:
+                for box, conf, cls in zip(r.boxes.xyxy.tolist(),
+                                          r.boxes.conf.tolist(),
+                                          r.boxes.cls.tolist()):
+                    detections.append({
+                        "class": yolo_model.names[int(cls)],
+                        "confidence": float(conf),
+                        "bbox": [float(x) for x in box]
+                    })
+                    yolo_score = max(yolo_score, float(conf))
 
-        for r in results:
-            for box, conf, cls in zip(r.boxes.xyxy.tolist(), r.boxes.conf.tolist(), r.boxes.cls.tolist()):
-                detections.append({
-                    "class": yolo_model.names[int(cls)],
-                    "confidence": float(conf),
-                    "bbox": [float(x) for x in box]
-                })
-                yolo_score = max(yolo_score, float(conf))
-
-        alpha, beta = 0.6, 0.4  # weights
+        alpha, beta = 0.6, 0.4
         fused_scores, risk_levels = [], []
 
         for prob in rockfall_probs:
-            severity = (alpha * prob) + (beta * yolo_score)
+            severity = (alpha * prob) + (beta * yolo_score if file is not None else 0.0)
             fused_scores.append(severity)
 
             if severity < 0.3:
@@ -70,11 +82,13 @@ async def fusion_predict(
             "rockfall_probabilities": rockfall_probs,
             "yolo_detections": detections,
             "fusion_scores": fused_scores,
-            "risk_levels": risk_levels
+            "risk_levels": risk_levels,
+            "used_image": file is not None  # ✅ helpful flag
         }
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-if _name_ == "_main_":
+
+if __name__ == "__main__":
     uvicorn.run("ml_pred:app", host="0.0.0.0", port=8000, reload=True)
