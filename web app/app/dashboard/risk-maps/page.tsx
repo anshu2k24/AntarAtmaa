@@ -1,6 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Line, Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  LineElement,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+ChartJS.register(
+  LineElement,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  Tooltip,
+  Legend
+);
 
 interface SensorData {
   temperature: number;
@@ -21,13 +42,14 @@ interface PredictionResponse {
     confidence: number;
     bbox: number[];
   }[];
+  createdAt?: string;
 }
 
-const SITE_ID = "68c95e7cc0f82d6249f8d6b4"; // 🔧 replace with dynamic later
+const SITE_ID = "68c95e7cc0f82d6249f8d6b4"; // 🔧 replace later
 
 export default function RiskDashboard() {
   const [sensorData, setSensorData] = useState<SensorData[]>([]);
-  const [prediction, setPrediction] = useState<PredictionResponse | null>(null);
+  const [predictions, setPredictions] = useState<PredictionResponse[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -43,14 +65,25 @@ export default function RiskDashboard() {
     }
   };
 
+  // Fetch predictions
+  const fetchPredictions = async () => {
+    try {
+      const res = await fetch(`/api/prediction?siteId=${SITE_ID}`);
+      if (!res.ok) throw new Error("Failed to fetch predictions");
+      const data = await res.json();
+      setPredictions(data.data || []);
+    } catch (err) {
+      console.error("Error fetching predictions:", err);
+    }
+  };
+
   // Run ML analysis
   const runAnalysis = async () => {
     if (sensorData.length === 0) return;
-
     setLoading(true);
 
     try {
-      const latest = sensorData[0]; // latest entry
+      const latest = sensorData[0];
       const date = new Date(latest.timestamp);
 
       const payload = [
@@ -81,9 +114,17 @@ export default function RiskDashboard() {
       });
 
       if (!res.ok) throw new Error("Prediction request failed");
-
       const result = await res.json();
-      setPrediction(result);
+
+      // Save prediction in DB
+      await fetch("http://localhost:3000/api/prediction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ siteId: SITE_ID, ...result }),
+      });
+
+      // Refresh predictions
+      fetchPredictions();
     } catch (err) {
       console.error("Error in ML pipeline:", err);
     } finally {
@@ -91,24 +132,64 @@ export default function RiskDashboard() {
     }
   };
 
-  // Auto refresh sensor data every 5 min
+  // Auto refresh every 5 min
   useEffect(() => {
     fetchSensorData();
-    const interval = setInterval(fetchSensorData, 5 * 60 * 1000);
+    fetchPredictions();
+    const interval = setInterval(() => {
+      fetchSensorData();
+      fetchPredictions();
+    }, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
-  return (
-    <div className="p-6 space-y-6 text-white">
-      <h1 className="text-3xl font-bold">⛰️ Rockfall Risk Dashboard</h1>
+  // Chart Data
+  const timestamps = predictions
+    .map((p) =>
+      p.createdAt ? new Date(p.createdAt).toLocaleTimeString() : "N/A"
+    )
+    .reverse();
 
-      {/* Upload Section */}
-      <div className="space-y-2">
+  const probData = {
+    labels: timestamps,
+    datasets: [
+      {
+        label: "Rockfall Probability",
+        data: predictions.map((p) => p.rockfall_probabilities[0] || 0).reverse(),
+        borderColor: "#3b82f6",
+        backgroundColor: "rgba(59,130,246,0.3)",
+      },
+    ],
+  };
+
+  const riskLevelsCount = {
+    Low: predictions.filter((p) => p.risk_levels.includes("Low")).length,
+    Medium: predictions.filter((p) => p.risk_levels.includes("Medium")).length,
+    High: predictions.filter((p) => p.risk_levels.includes("High")).length,
+  };
+
+  const riskData = {
+    labels: ["Low", "Medium", "High"],
+    datasets: [
+      {
+        label: "Risk Level Count",
+        data: [riskLevelsCount.Low, riskLevelsCount.Medium, riskLevelsCount.High],
+        backgroundColor: ["#22c55e", "#eab308", "#ef4444"],
+      },
+    ],
+  };
+
+  return (
+    <div className="p-6 space-y-6 text-white bg-gray-900 min-h-screen">
+      <h1 className="text-3xl font-bold mb-4">⛰️ Rockfall Risk Dashboard</h1>
+
+      {/* Controls */}
+      <div className="flex items-center gap-4">
         <input
           type="file"
           accept="image/*"
           onChange={(e) => setFile(e.target.files?.[0] || null)}
-          className="block w-full text-sm text-gray-400
+          className="block w-full text-sm text-gray-300
                      file:mr-4 file:py-2 file:px-4
                      file:rounded-full file:border-0
                      file:text-sm file:font-semibold
@@ -124,40 +205,119 @@ export default function RiskDashboard() {
         </button>
       </div>
 
-      {/* Latest Sensor Data */}
-      <div className="bg-gray-800 p-4 rounded-lg">
-        <h2 className="text-xl font-semibold mb-2">Latest Sensor Data</h2>
-        {sensorData.length > 0 ? (
-          <pre className="text-sm bg-gray-900 p-3 rounded overflow-x-auto">
-            {JSON.stringify(sensorData[0], null, 2)}
-          </pre>
-        ) : (
-          <p className="text-gray-400">No sensor data available</p>
-        )}
+      {/* Sensor + Prediction Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Latest Sensor Data */}
+        <div className="bg-gray-800 p-4 rounded-lg">
+          <h2 className="text-xl font-semibold mb-3">Latest Sensor Data</h2>
+          {sensorData.length > 0 ? (
+            <ul className="space-y-1 text-sm">
+              {Object.entries(sensorData[0]).map(([key, value]) =>
+                key !== "timestamp" ? (
+                  <li
+                    key={key}
+                    className="flex justify-between border-b border-gray-700 py-1"
+                  >
+                    <span className="capitalize">{key.replace("_", " ")}:</span>
+                    <span className="font-mono">{value as number}</span>
+                  </li>
+                ) : null
+              )}
+            </ul>
+          ) : (
+            <p className="text-gray-400">No sensor data available</p>
+          )}
+        </div>
+
+        {/* Last Prediction */}
+        <div className="bg-gray-800 p-4 rounded-lg">
+          <h2 className="text-xl font-semibold mb-3">Latest Prediction</h2>
+          {predictions.length > 0 ? (
+            <div className="space-y-2 text-sm">
+              <p>
+                <strong>Risk:</strong>{" "}
+                <span
+                  className={`${
+                    predictions[0].risk_levels.includes("High")
+                      ? "text-red-500"
+                      : predictions[0].risk_levels.includes("Medium")
+                      ? "text-yellow-400"
+                      : "text-green-400"
+                  }`}
+                >
+                  {predictions[0].risk_levels.join(", ")}
+                </span>
+              </p>
+              <p>
+                <strong>Probability:</strong>{" "}
+                {(predictions[0].rockfall_probabilities[0] * 100).toFixed(1)}%
+              </p>
+              <p>
+                <strong>Fusion Score:</strong>{" "}
+                {predictions[0].fusion_scores[0]?.toFixed(2) || "-"}
+              </p>
+            </div>
+          ) : (
+            <p className="text-gray-400">No predictions yet</p>
+          )}
+        </div>
       </div>
 
-      {/* Prediction Results */}
-      {prediction && (
-        <div className="bg-gray-800 p-4 rounded-lg space-y-3">
-          <h2 className="text-xl font-semibold">Prediction Results</h2>
-          <p>
-            <strong>Risk Levels:</strong>{" "}
-            {prediction.risk_levels.join(", ")}
-          </p>
-          <p>
-            <strong>Probabilities:</strong>{" "}
-            {prediction.rockfall_probabilities.map((p) => p.toFixed(2)).join(", ")}
-          </p>
-          <p>
-            <strong>Fusion Scores:</strong>{" "}
-            {prediction.fusion_scores.map((s) => s.toFixed(2)).join(", ")}
-          </p>
-          <div>
-            <strong>Detections:</strong>
-            <pre className="text-sm bg-gray-900 p-3 rounded overflow-x-auto">
-              {JSON.stringify(prediction.yolo_detections, null, 2)}
-            </pre>
+      {/* Charts */}
+      {predictions.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-gray-800 p-4 rounded-lg">
+            <h2 className="text-xl mb-3">📈 Rockfall Probability Over Time</h2>
+            <Line data={probData} />
           </div>
+
+          <div className="bg-gray-800 p-4 rounded-lg">
+            <h2 className="text-xl mb-3">📊 Risk Level Distribution</h2>
+            <Bar data={riskData} />
+          </div>
+        </div>
+      )}
+
+      {/* Last 5 Predictions */}
+      {predictions.length > 0 && (
+        <div className="bg-gray-800 p-4 rounded-lg">
+          <h2 className="text-xl mb-3">Recent Predictions</h2>
+          <table className="w-full text-sm text-left border-collapse">
+            <thead>
+              <tr className="border-b border-gray-700">
+                <th className="py-2">Time</th>
+                <th>Risk</th>
+                <th>Probability</th>
+                <th>Fusion Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {predictions.slice(0, 5).map((p, i) => (
+                <tr key={i} className="border-b border-gray-700">
+                  <td className="py-2">
+                    {p.createdAt
+                      ? new Date(p.createdAt).toLocaleTimeString()
+                      : "-"}
+                  </td>
+                  <td>
+                    <span
+                      className={`${
+                        p.risk_levels.includes("High")
+                          ? "text-red-500"
+                          : p.risk_levels.includes("Medium")
+                          ? "text-yellow-400"
+                          : "text-green-400"
+                      }`}
+                    >
+                      {p.risk_levels.join(", ")}
+                    </span>
+                  </td>
+                  <td>{(p.rockfall_probabilities[0] * 100).toFixed(1)}%</td>
+                  <td>{p.fusion_scores[0]?.toFixed(2) || "-"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
