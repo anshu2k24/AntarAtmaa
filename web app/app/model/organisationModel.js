@@ -1,45 +1,59 @@
-import mongoose from 'mongoose'; // Use import for modern JS modules
+import mongoose from 'mongoose';
 
-const organizationSchema = new mongoose.Schema({ // Use mongoose.Schema
-  name: {
-    type: String,
-    required: true
+const organizationSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+    contact: {
+      type: String,
+      trim: true,
+    },
+    registeredAddress: {
+      street: { type: String },
+      city: { type: String },
+      state: { type: String },
+      zip: { type: String },
+      country: { type: String },
+    },
+    corporationIdentificationNumber: {
+      type: String,
+      trim: true,
+    },
+    registrationType: {
+      type: String,
+      enum: [
+        'Private Limited Company',
+        'Public Corporation',
+        'Government Entity',
+        'Other',
+      ],
+    },
+    sites: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Site',
+      },
+    ],
+    employees: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Employee',
+      },
+    ],
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  contact: {
-    type: String
-  },
-  registeredAddress: {
-    street: String,
-    city: String,
-    state: String,
-    zip: String,
-    country: String
-  },
-  corporationIdentificationNumber: {
-    type: String
-  },
-  registrationType: {
-    type: String,
-    enum: ["Private Limited Company", "Public Corporation", "Government Entity", "Other"]
-  },
-  // An array of ObjectIds referencing the 'Site' documents.
-  sites: [{
-    type: mongoose.Schema.Types.ObjectId, // Use mongoose.Schema.Types.ObjectId
-    ref: 'Site'
-  }],
-  // An array of ObjectIds referencing the 'Employee' documents.
-  employees: [{
-    type: mongoose.Schema.Types.ObjectId, // Use mongoose.Schema.Types.ObjectId
-    ref: 'Employee'
-  }]
-}, {
-  timestamps: true
-});
+  { timestamps: true }
+);
 
-// Use the mongoose.models object to prevent re-compiling models
-export default mongoose.models.Organization || mongoose.model('Organization', organizationSchema);
+// ✅ Prevent model recompilation issues in Next.js
+export default mongoose.models.Organization ||
+  mongoose.model('Organization', organizationSchema);

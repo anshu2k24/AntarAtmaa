@@ -1,36 +1,40 @@
 import mongoose from 'mongoose';
 
-const siteSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true
+const siteSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    location: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    coordinates: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+    },
+    organizationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Organization',
+      required: true,
+    },
+    linkedEmployees: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Employee',
+      },
+    ],
+    businessProofLicense: {
+      type: String,
+      required: true,
+      trim: true,
+    },
   },
-  location: {
-    type: String,
-    required: true
-  },
-  coordinates: {
-    latitude: Number,
-    longitude: Number
-  },
-  organizationId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Organization',
-    required: true
-  },
-  linkedEmployees: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Employee'
-  }],
-  businessProofLicense: {
-    type: String,
-    required: true
-  }
-  // The 'demTiff' field has been removed.
-}, {
-  timestamps: true
-});
+  { timestamps: true }
+);
 
-const Site = mongoose.models.Site || mongoose.model('Site', siteSchema);
-
-export default Site;
+// ✅ Prevent model recompilation issues in Next.js
+export default mongoose.models.Site || mongoose.model('Site', siteSchema);
