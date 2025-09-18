@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { sendAlertEmail } from "../../services/email";
 import dbConnect from "../../lib/dbConnect";
 import Alert from "../../model/alertModel";
+import { sendAlertSMS } from "../../services/sms";
 
 export async function POST(req) {
   await dbConnect();
@@ -12,7 +13,7 @@ export async function POST(req) {
   
     if (!["Medium", "High"].includes(level)) {
       return NextResponse.json(
-        { message: "Low/Critical alert ignored for email" },
+        { message: "Low alert ignored for email" },
         { status: 200 }
       );
     }
@@ -52,6 +53,7 @@ export async function POST(req) {
 
    
     await sendAlertEmail({ siteId, prediction, level });
+    await sendAlertSMS({ siteId, level });
 
     
     const newAlert = new Alert({
