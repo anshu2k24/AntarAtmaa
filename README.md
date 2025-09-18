@@ -177,7 +177,7 @@ We are passionate innovators with expertise in **AI, web dev, and IoT**—workin
 ##   Contact
 
 For collaborations & inquiries:
-  \[Your Email Address]
+  \[mail2panshu@gmail.com]
 
 ---
 
