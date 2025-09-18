@@ -45,22 +45,22 @@ const SensorDataPage = () => {
     }
   }, []);
 
-  // Initial fetch + auto-refresh every 5 minutes
+  
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 300000); // 5 min
+    const interval = setInterval(fetchData, 300000); 
     return () => clearInterval(interval);
   }, [fetchData]);
 
   if (loading) {
     return (
-      <div className="text-center py-20 text-gray-300">Loading sensor data...</div>
+      <div className="text-center py-20 text-gray-500">Loading sensor data...</div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center py-20 text-red-400">
+      <div className="text-center py-20 text-red-500">
         Error: {error}
       </div>
     );
@@ -68,35 +68,35 @@ const SensorDataPage = () => {
 
   if (!sensorData.length) {
     return (
-      <div className="text-center py-20 text-gray-400">
+      <div className="text-center py-20 text-gray-500">
         No sensor data available.
       </div>
     );
   }
 
-  // latest record
+  
   const latest = sensorData[0];
 
   return (
-    <div className="space-y-10">
-      {/* Header + Refresh */}
+    <div className="space-y-10 bg-[#f2f0ea] p-6 min-h-screen text-gray-800">
+     
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">Sensor Dashboard</h1>
-          <p className="text-gray-400 mt-1">Site ID: {localStorage.getItem('siteId')}</p>
+          <h1 className="text-3xl font-bold">Sensor Dashboard</h1>
+          <p className="text-gray-600 mt-1">Site ID: {localStorage.getItem('siteId')}</p>
         </div>
         <button
           onClick={fetchData}
-          className="flex items-center space-x-2 px-4 py-2 rounded-lg border border-gray-500 text-gray-300 hover:bg-gray-700 transition-colors"
+          className="flex items-center space-x-2 px-4 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-200 transition-colors"
         >
           <FaSyncAlt />
           <span>Refresh</span>
         </button>
       </div>
 
-      {/* Latest Sensor Snapshot */}
+      
       <div>
-        <h2 className="text-xl font-semibold text-white mb-4">Latest Readings</h2>
+        <h2 className="text-xl font-semibold mb-4">Latest Readings</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <SensorCard label="Temperature" value={`${latest.temperature} °C`} />
           <SensorCard label="Rainfall" value={`${latest.rainfall} mm`} />
@@ -105,30 +105,30 @@ const SensorDataPage = () => {
           <SensorCard label="Pore Pressure" value={`${latest.porepressure} kPa`} />
           <SensorCard label="Displacement" value={`${latest.displacement} m`} />
         </div>
-        <p className="text-gray-400 text-sm mt-2">
+        <p className="text-gray-500 text-sm mt-2">
           Last updated: {new Date(latest.timestamp).toLocaleString()}
         </p>
       </div>
 
-      {/* History Table */}
+      
       <div>
-        <h2 className="text-xl font-semibold text-white mb-4">History</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full border border-gray-700 text-sm text-gray-300">
-            <thead className="bg-gray-800 text-gray-200">
+        <h2 className="text-xl font-semibold mb-4">History</h2>
+        <div className="overflow-x-auto bg-white rounded-lg shadow-md">
+          <table className="w-full text-sm text-gray-700">
+            <thead className="bg-gray-100 text-gray-700">
               <tr>
-                <th className="px-4 py-2 text-left">Timestamp</th>
-                <th className="px-4 py-2">Temp (°C)</th>
-                <th className="px-4 py-2">Rainfall (mm)</th>
-                <th className="px-4 py-2">Soil Moisture (%)</th>
-                <th className="px-4 py-2">Vibration RMS</th>
-                <th className="px-4 py-2">Pore Pressure (kPa)</th>
-                <th className="px-4 py-2">Displacement (m)</th>
+                <th className="px-4 py-3 text-left">Timestamp</th>
+                <th className="px-4 py-3">Temp (°C)</th>
+                <th className="px-4 py-3">Rainfall (mm)</th>
+                <th className="px-4 py-3">Soil Moisture (%)</th>
+                <th className="px-4 py-3">Vibration RMS</th>
+                <th className="px-4 py-3">Pore Pressure (kPa)</th>
+                <th className="px-4 py-3">Displacement (m)</th>
               </tr>
             </thead>
             <tbody>
               {sensorData.map((data) => (
-                <tr key={data._id} className="border-t border-gray-700 hover:bg-gray-700/50">
+                <tr key={data._id} className="border-t border-gray-200 hover:bg-gray-50">
                   <td className="px-4 py-2">{new Date(data.timestamp).toLocaleString()}</td>
                   <td className="px-4 py-2">{data.temperature}</td>
                   <td className="px-4 py-2">{data.rainfall}</td>
@@ -146,11 +146,11 @@ const SensorDataPage = () => {
   );
 };
 
-// Card component
+
 const SensorCard = ({ label, value }: { label: string; value: string }) => (
-  <div className="bg-[#1e293b] p-6 rounded-lg shadow-lg space-y-2">
-    <h3 className="text-lg font-semibold text-white">{label}</h3>
-    <p className="text-2xl font-bold text-blue-400">{value}</p>
+  <div className="bg-white p-6 rounded-lg shadow-lg space-y-2 border border-gray-200">
+    <h3 className="text-lg font-semibold text-gray-700">{label}</h3>
+    <p className="text-2xl font-bold text-orange-500">{value}</p>
   </div>
 );
 

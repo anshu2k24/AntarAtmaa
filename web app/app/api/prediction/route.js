@@ -2,7 +2,6 @@ import dbConnect from "../../lib/dbConnect";
 import Prediction from "../../model/predictionModel";
 import { NextResponse } from "next/server";
 
-// POST -> Save prediction
 export async function POST(req) {
   await dbConnect();
   try {
@@ -23,7 +22,7 @@ export async function POST(req) {
   }
 }
 
-// GET -> Fetch predictions by siteId
+
 export async function GET(req) {
   await dbConnect();
   try {

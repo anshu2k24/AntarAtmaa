@@ -58,7 +58,7 @@ const AboutPage = () => {
             </li>
           </ul>
         </div>
-        {/* AI-Powered Protection placeholder */}
+      
         <div className="bg-[#2a3648] rounded-xl h-[500px] flex items-center justify-center relative overflow-hidden">
           <div className="grid grid-cols-6 grid-rows-6 h-full w-full opacity-10">
             {Array.from({ length: 36 }).map((_, i) => (

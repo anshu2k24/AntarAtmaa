@@ -8,12 +8,10 @@ import {
   FaCubes,
   FaCloudSun,
   FaBell,
-  FaExclamationTriangle,
-  FaChartLine,
   FaBars,
 } from "react-icons/fa";
 
-// Props type for Sidebar
+
 interface SidebarProps {
   isCollapsed: boolean;
   setIsCollapsed: (collapsed: boolean) => void;
@@ -40,13 +38,13 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
 
   return (
     <aside
-      className={`fixed top-0 left-0 z-50 h-full bg-[#1e293b] text-white border-r border-gray-700 transition-all duration-300
+      className={`fixed top-0 left-0 z-50 h-full bg-[#373434] text-white border-r border-gray-700 transition-all duration-300
       ${isCollapsed ? "w-20" : "w-64"} hidden lg:flex flex-col`}
     >
-      {/* Collapse/Expand Button */}
+      
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-500 transition"
+        className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-white text-[#373434] p-2 rounded-full shadow-lg hover:bg-gray-200 transition"
       >
         <FaBars />
       </button>
@@ -61,8 +59,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
               className={`flex items-center space-x-3 p-3 rounded-lg transition-colors
                 ${
                   isActive
-                    ? "bg-blue-600 text-white"
-                    : "hover:bg-gray-700 text-gray-400"
+                    ? "bg-[#645e54] text-white"
+                    : "hover:bg-gray-700 text-gray-300"
                 }
               `}
             >

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs'; // Need to install this library: npm install bcryptjs
+import bcrypt from 'bcryptjs'; 
 
-const employeeSchema = new mongoose.Schema({ // FIX 1: Use mongoose.Schema
+const employeeSchema = new mongoose.Schema({ 
   name: {
     type: String,
     required: true
@@ -21,21 +21,21 @@ const employeeSchema = new mongoose.Schema({ // FIX 1: Use mongoose.Schema
     required: true
   },
   organizationId: {
-    type: mongoose.Schema.Types.ObjectId, // FIX 2: Use mongoose.Schema.Types.ObjectId
+    type: mongoose.Schema.Types.ObjectId, 
     ref: 'Organization',
     required: true
   },
   linkedSites: [{
-    type: mongoose.Schema.Types.ObjectId, // FIX 2: Use mongoose.Schema.Types.ObjectId
+    type: mongoose.Schema.Types.ObjectId, 
     ref: 'Site'
   }]
 }, {
   timestamps: true
 });
 
-// FIX 3: Password Hashing Middleware
+
 employeeSchema.pre('save', async function(next) {
-  // Only hash the password if it's new or has been modified
+  
   if (!this.isModified('password')) {
     return next();
   }
@@ -44,5 +44,5 @@ employeeSchema.pre('save', async function(next) {
   next();
 });
 
-// FIX 4: Mongoose Model Caching for Next.js
+
 export default mongoose.models.Employee || mongoose.model('Employee', employeeSchema);

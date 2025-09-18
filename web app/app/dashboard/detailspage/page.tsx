@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { FaBuilding, FaMapMarkerAlt, FaUser } from "react-icons/fa";
 
 interface IAddress {
   street: string;
@@ -79,7 +80,7 @@ const DashboardDetailsPage = () => {
 
   if (error) {
     return (
-      <div className="bg-[#1e293b] text-white min-h-screen flex items-center justify-center">
+      <div className="bg-[#f2f0ea] text-gray-800 min-h-screen flex items-center justify-center">
         <p className="text-xl text-red-500">{error}</p>
       </div>
     );
@@ -87,7 +88,7 @@ const DashboardDetailsPage = () => {
 
   if (!userData) {
     return (
-      <div className="bg-[#1e293b] text-white min-h-screen flex items-center justify-center">
+      <div className="bg-[#f2f0ea] text-gray-800 min-h-screen flex items-center justify-center">
         <p className="text-xl">Loading user data...</p>
       </div>
     );
@@ -96,17 +97,20 @@ const DashboardDetailsPage = () => {
   const { organizationData, siteData, employeeData } = userData;
 
   return (
-    <div className="bg-[#1e293b] text-white min-h-screen flex flex-col items-center justify-center p-12">
-      <div className="text-center mb-10">
-        <h1 className="text-3xl font-bold">User Details</h1>
-        <p className="text-gray-400 mt-2">Fetched from MongoDB via API</p>
+    <div className="bg-[#f2f0ea] text-gray-800 min-h-screen p-6 w-full">
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-extrabold text-[#373434] drop-shadow-sm">User Details</h1>
+        <p className="text-gray-600 mt-2">Information fetched from the database</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-7xl">
-        {/* Organization */}
-        <div className="bg-[#2a3648] p-8 rounded-xl shadow-lg border border-gray-700">
-          <h2 className="text-xl font-bold mb-6 text-center">Organization Info</h2>
-          <div className="space-y-2 text-gray-300">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+       
+        <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-200 hover:shadow-2xl hover:-translate-y-2 transition-transform duration-300">
+          <div className="flex items-center space-x-4 mb-6 pb-4 border-b border-gray-200">
+            <FaBuilding className="text-3xl text-orange-500" />
+            <h2 className="text-2xl font-bold text-gray-800">Organization Info</h2>
+          </div>
+          <div className="space-y-4 text-gray-700">
             <p><b>Name:</b> {organizationData.name}</p>
             <p><b>Email:</b> {organizationData.email}</p>
             <p><b>Contact:</b> {organizationData.contact}</p>
@@ -120,10 +124,13 @@ const DashboardDetailsPage = () => {
           </div>
         </div>
 
-        {/* Site */}
-        <div className="bg-[#2a3648] p-8 rounded-xl shadow-lg border border-gray-700">
-          <h2 className="text-xl font-bold mb-6 text-center">Site Info</h2>
-          <div className="space-y-2 text-gray-300">
+      
+        <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-200 hover:shadow-2xl hover:-translate-y-2 transition-transform duration-300">
+          <div className="flex items-center space-x-4 mb-6 pb-4 border-b border-gray-200">
+            <FaMapMarkerAlt className="text-3xl text-orange-500" />
+            <h2 className="text-2xl font-bold text-gray-800">Site Info</h2>
+          </div>
+          <div className="space-y-4 text-gray-700">
             <p><b>Name:</b> {siteData.name}</p>
             <p><b>Location:</b> {siteData.location}</p>
             <p><b>Latitude:</b> {siteData.coordinates.latitude}</p>
@@ -134,7 +141,7 @@ const DashboardDetailsPage = () => {
                 href={siteData.businessProofLicense}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-400 hover:underline"
+                className="text-blue-500 hover:underline"
               >
                 View License
               </a>
@@ -142,10 +149,13 @@ const DashboardDetailsPage = () => {
           </div>
         </div>
 
-        {/* Employee */}
-        <div className="bg-[#2a3648] p-8 rounded-xl shadow-lg border border-gray-700">
-          <h2 className="text-xl font-bold mb-6 text-center">Employee Info</h2>
-          <div className="space-y-2 text-gray-300">
+      
+        <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-200 hover:shadow-2xl hover:-translate-y-2 transition-transform duration-300">
+          <div className="flex items-center space-x-4 mb-6 pb-4 border-b border-gray-200">
+            <FaUser className="text-3xl text-orange-500" />
+            <h2 className="text-2xl font-bold text-gray-800">Employee Info</h2>
+          </div>
+          <div className="space-y-4 text-gray-700">
             <p><b>Name:</b> {employeeData.name}</p>
             <p><b>Email:</b> {employeeData.email}</p>
             <p><b>Designation:</b> {employeeData.designation}</p>

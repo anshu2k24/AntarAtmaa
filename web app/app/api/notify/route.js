@@ -9,7 +9,7 @@ export async function POST(req) {
     const body = await req.json();
     const { siteId, prediction, level } = body;
 
-    // 1. Only notify for Medium/High
+  
     if (!["Medium", "High"].includes(level)) {
       return NextResponse.json(
         { message: "Low/Critical alert ignored for email" },
@@ -17,7 +17,7 @@ export async function POST(req) {
       );
     }
 
-    // 2. Find the last alert for this site
+   
     const lastAlert = await Alert.findOne({ siteId })
       .sort({ createdAt: -1 })
       .lean();
@@ -28,7 +28,7 @@ export async function POST(req) {
       const diffMs = now - new Date(lastAlert.createdAt);
       const diffMins = diffMs / 1000 / 60;
 
-      // 2a. Cooldown: block if < 1 min since last alert
+     
       if (diffMins < 1) {
         return NextResponse.json(
           { message: "Skipped due to cooldown" },
@@ -36,7 +36,7 @@ export async function POST(req) {
         );
       }
 
-      // 2b. Redundancy: skip if same risk + unchanged probs within 10 min
+  
       if (
         lastAlert.level === level &&
         diffMins < 10 &&
@@ -50,10 +50,10 @@ export async function POST(req) {
       }
     }
 
-    // 3. Send email
+   
     await sendAlertEmail({ siteId, prediction, level });
 
-    // 4. Save alert in DB
+    
     const newAlert = new Alert({
       siteId,
       predictionId: prediction._id,

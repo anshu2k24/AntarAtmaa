@@ -21,7 +21,7 @@ const alertSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    sentTo: [String], // list of emails/phones that got notified
+    sentTo: [String], 
   },
   { timestamps: true }
 );

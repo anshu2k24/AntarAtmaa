@@ -36,5 +36,5 @@ const siteSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// ✅ Prevent model recompilation issues in Next.js
+
 export default mongoose.models.Site || mongoose.model('Site', siteSchema);

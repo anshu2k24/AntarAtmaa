@@ -1,9 +1,9 @@
 import dbConnect from "../../lib/dbConnect";
 import Alert from "../../model/alertModel";
-import Prediction from "../../model/predictionModel"; // ⏪ Import it
+import Prediction from "../../model/predictionModel";
 import { NextResponse } from "next/server";
 
-// POST -> Save alert
+
 export async function POST(req) {
   await dbConnect();
   try {
@@ -40,7 +40,7 @@ export async function POST(req) {
   }
 }
 
-// GET -> Fetch alerts by siteId
+
 export async function GET(req) {
   await dbConnect();
   try {
@@ -55,7 +55,7 @@ export async function GET(req) {
     }
 
     const alerts = await Alert.find({ siteId })
-      .populate("predictionId") // now works since Prediction is registered
+      .populate("predictionId") 
       .sort({ createdAt: -1 })
       .limit(50);
 

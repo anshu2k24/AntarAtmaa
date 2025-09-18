@@ -44,7 +44,7 @@ const sensorDataSchema = new mongoose.Schema({
     description: "Ground displacement in meters."
   }
 }, {
-  timestamps: false // We are managing the 'timestamp' field manually
+  timestamps: false 
 });
 
 export default mongoose.models.SensorData || mongoose.model('SensorData', sensorDataSchema);

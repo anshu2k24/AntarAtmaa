@@ -3,10 +3,10 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
-// env variables (make sure these exist in .env.local)
+
 const ALERT_EMAIL_USER = process.env.ALERT_EMAIL_USER;
 const ALERT_EMAIL_PASS = process.env.ALERT_EMAIL_PASS;
-const ALERT_RECEIVER_EMAIL = process.env.ALERT_RECEIVER_EMAIL; // e.g. team or admin email
+const ALERT_RECEIVER_EMAIL = process.env.ALERT_RECEIVER_EMAIL; 
 
 // Create transporter
 const transporter = nodemailer.createTransport({
@@ -18,11 +18,11 @@ const transporter = nodemailer.createTransport({
 });
 
 /**
- * Sends an alert email when prediction >= Medium/High
- * @param {Object} alertData - Data of the alert
- * @param {string} alertData.level - Risk level (Medium/High/Critical)
- * @param {string} alertData.siteId - Site ID for the prediction
- * @param {Object} alertData.prediction - Prediction payload
+ *
+ * @param {Object} alertData 
+ * @param {string} alertData.level 
+ * @param {string} alertData.siteId
+ * @param {Object} alertData.prediction
  */
 const sendAlertEmail = async (alertData) => {
   const { level, siteId, prediction } = alertData;

@@ -11,7 +11,7 @@ const Footer = () => {
   return (
     <footer className="bg-[#1e293b] text-gray-400 py-12">
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
-        {/* Left Section */}
+      
         <div className="flex flex-col space-y-4">
           <div className="flex items-center space-x-2">
             <FaLock className="h-8 w-8 text-blue-500" />

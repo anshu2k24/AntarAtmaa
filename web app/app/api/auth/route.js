@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import dbConnect from '../../lib/dbConnect';
 import Employee from '../../model/employeeModel';
-import Organization from '../../model/organisationModel'; // ✅ import to register schema
-import Site from '../../model/siteModel';                 // ✅ import to register schema
+import Organization from '../../model/organisationModel'; 
+import Site from '../../model/siteModel';                 
 
 export async function POST(req) {
   try {
@@ -18,7 +18,7 @@ export async function POST(req) {
       );
     }
 
-    // ✅ populate works because models are registered
+    
     const employee = await Employee.findOne({ email })
       .populate('organizationId')
       .populate('linkedSites');
