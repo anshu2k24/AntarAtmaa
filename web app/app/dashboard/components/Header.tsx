@@ -28,10 +28,10 @@ const Header = ({ isSidebarCollapsed }: HeaderProps) => {
           }`}
         >
           <Image
-            src="/logo.png"
+            src="/logofinal.png"
             alt="DisasterAI Logo"
-            width={200}
-            height={100}
+            width={500}
+            height={500}
             className="object-contain max-h-12 w-auto"
             priority
           />

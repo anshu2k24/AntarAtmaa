@@ -10,14 +10,14 @@ const reviews = [
     rating: 5,
   },
   {
-    name: "Sophia Johnson",
-    role: "Safety Officer",
+    name: "Sophia Qureshi",
+    role: "Head of Safety",
     text: "The real-time alerts are a lifesaver! I can confidently say this system prevents accidents before they happen.",
     rating: 4,
-  },
+  }, 
   {
     name: "Ravi Sharma",
-    role: "Operations Manager",
+    role: "Chief Geologist",
     text: "Easy to integrate, reliable, and backed with solid AI. It’s now an essential part of our operations.",
     rating: 5,
   },
@@ -35,19 +35,21 @@ const Reviews = () => {
           {reviews.map((review, index) => (
             <div
               key={index}
-              className="bg-[#f3e8d0]/90 p-6 rounded-xl shadow-lg hover:scale-105 transform transition duration-300"
+              className="bg-gradient-to-br from-[#f3e8d0] to-[#f9f5f0] p-8 rounded-2xl shadow-xl hover:shadow-2xl hover:scale-105 transform transition duration-300"
             >
               {/* Rating */}
               <div className="flex justify-center mb-4 text-[#c29f5b]">
                 {Array(review.rating)
                   .fill(0)
                   .map((_, i) => (
-                    <FaStar key={i} className="h-5 w-5" />
+                    <FaStar key={i} className="h-6 w-6" />
                   ))}
               </div>
 
               {/* Text */}
-              <p className="text-[#4a3f2a] italic mb-4">"{review.text}"</p>
+              <p className="text-xl italic font-serif text-[#4a3f2a] mb-6">
+                "{review.text}"
+              </p>
 
               {/* User Info */}
               <h3 className="text-lg font-semibold text-gray-900">
