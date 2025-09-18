@@ -1,20 +1,26 @@
 import Link from "next/link";
+import Image from "next/image"; // Add this line
 import {
   FaTwitter,
   FaYoutube,
   FaLinkedinIn,
   FaEnvelope,
-  FaLock,
 } from "react-icons/fa";
 
 const Footer = () => {
   return (
     <footer className="bg-[#f9f5f0] text-gray-900 py-12 border-t border-[#e6d3a3]">
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
-      
         <div className="flex flex-col space-y-4">
           <div className="flex items-center space-x-2">
-            <FaLock className="h-8 w-8 text-[#4a5a3c]" />
+            <Image
+              src="/logo.png"
+              alt="RockSafe AI Logo"
+              width={100}
+              height={50}
+              className="object-contain max-h-12 w-auto"
+              priority
+            />
             <span className="text-[#4a5a3c] text-xl font-bold">
               RockSafe AI
             </span>
@@ -28,30 +34,30 @@ const Footer = () => {
             <a
               href="#"
               aria-label="Twitter"
-              className="p-2 rounded-full border border-[#4a5a3c] hover:bg-[#4a5a3c]/10 transition-colors"
+              className="p-2 rounded-full border border-[#4a5a3c] text-[#4a5a3c] hover:bg-[#4a5a3c] hover:text-white transition-colors"
             >
-              <FaTwitter className="h-4 w-4 text-[#4a5a3c]" />
+              <FaTwitter className="h-4 w-4" />
             </a>
             <a
               href="#"
               aria-label="YouTube"
-              className="p-2 rounded-full border border-[#4a5a3c] hover:bg-[#4a5a3c]/10 transition-colors"
+              className="p-2 rounded-full border border-[#4a5a3c] text-[#4a5a3c] hover:bg-[#4a5a3c] hover:text-white transition-colors"
             >
-              <FaYoutube className="h-4 w-4 text-[#4a5a3c]" />
+              <FaYoutube className="h-4 w-4" />
             </a>
             <a
               href="#"
               aria-label="LinkedIn"
-              className="p-2 rounded-full border border-[#4a5a3c] hover:bg-[#4a5a3c]/10 transition-colors"
+              className="p-2 rounded-full border border-[#4a5a3c] text-[#4a5a3c] hover:bg-[#4a5a3c] hover:text-white transition-colors"
             >
-              <FaLinkedinIn className="h-4 w-4 text-[#4a5a3c]" />
+              <FaLinkedinIn className="h-4 w-4" />
             </a>
             <a
               href="#"
               aria-label="Email"
-              className="p-2 rounded-full border border-[#4a5a3c] hover:bg-[#4a5a3c]/10 transition-colors"
+              className="p-2 rounded-full border border-[#4a5a3c] text-[#4a5a3c] hover:bg-[#4a5a3c] hover:text-white transition-colors"
             >
-              <FaEnvelope className="h-4 w-4 text-[#4a5a3c]" />
+              <FaEnvelope className="h-4 w-4" />
             </a>
           </div>
         </div>
