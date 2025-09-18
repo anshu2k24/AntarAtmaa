@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { FaUserCircle, FaSignOutAlt, FaBars } from "react-icons/fa";
+import { FaSignOutAlt, FaBars } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 
 interface HeaderProps {
@@ -10,7 +10,9 @@ const Header = ({ isSidebarCollapsed }: HeaderProps) => {
   const router = useRouter();
 
   const handleLogout = () => {
-    console.log("User logged out");
+    // Clear all local storage data
+    localStorage.clear();
+    // Redirect to login/home page
     router.push("/");
   };
 
@@ -35,11 +37,8 @@ const Header = ({ isSidebarCollapsed }: HeaderProps) => {
           />
         </span>
       </div>
+
       <div className="flex items-center space-x-4">
-        <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-300">Welcome back, Alex</span>
-          <FaUserCircle className="h-8 w-8 text-gray-400" />
-        </div>
         <button
           onClick={handleLogout}
           className="flex items-center space-x-2 text-red-500 hover:text-red-400 transition-colors"

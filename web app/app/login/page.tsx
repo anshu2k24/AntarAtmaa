@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaLock } from 'react-icons/fa';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -10,9 +10,21 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const router = useRouter();
 
+  // Redirect if already logged in
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const employeeId = localStorage.getItem('employeeId');
+      const organizationId = localStorage.getItem('organizationId');
+      const siteId = localStorage.getItem('siteId');
+
+      if (employeeId && organizationId && siteId) {
+        router.replace('/dashboard'); // redirect if already logged in
+      }
+    }
+  }, [router]);
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Attempting to send login request...');
 
     try {
       const response = await fetch('http://localhost:3000/api/auth', {
@@ -34,7 +46,6 @@ const LoginPage = () => {
       }
 
       const data = await response.json();
-      console.log('Login successful:', data);
 
       // Save IDs in localStorage
       if (typeof window !== 'undefined') {
@@ -43,7 +54,7 @@ const LoginPage = () => {
         localStorage.setItem('siteId', data.siteId);
       }
 
-      // Redirect
+      // Redirect to dashboard
       router.push('/dashboard');
     } catch (error: any) {
       console.error('Login error:', error);
