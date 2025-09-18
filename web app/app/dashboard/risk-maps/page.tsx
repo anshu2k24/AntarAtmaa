@@ -43,6 +43,7 @@ interface PredictionResponse {
     bbox: number[];
   }[];
   createdAt?: string;
+  _id?: string;
 }
 
 const SITE_ID = "68c95e7cc0f82d6249f8d6b4"; // 🔧 replace later
@@ -65,34 +66,19 @@ export default function RiskDashboard() {
     }
   };
 
-// Inside fetchPredictions
-const fetchPredictions = async () => {
-  try {
-    const res = await fetch(`/api/prediction?siteId=${SITE_ID}`);
-    if (!res.ok) throw new Error("Failed to fetch predictions");
-    const data = await res.json();
-    setPredictions(data.data || []);
-
-    // ⏩ Trigger mail notification on refresh if prediction exists
-    if (data.data && data.data.length > 0) {
-      const latestPrediction = data.data[0];
-      await fetch("/api/notify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          siteId: SITE_ID,
-          prediction: latestPrediction,
-          level: latestPrediction.risk_levels[0] || "Low",
-        }),
-      });
+  // Fetch predictions
+  const fetchPredictions = async () => {
+    try {
+      const res = await fetch(`/api/prediction?siteId=${SITE_ID}`);
+      if (!res.ok) throw new Error("Failed to fetch predictions");
+      const data = await res.json();
+      setPredictions(data.data || []);
+    } catch (err) {
+      console.error("Error fetching predictions:", err);
     }
-  } catch (err) {
-    console.error("Error fetching predictions:", err);
-  }
-};
+  };
 
-
-  // Run ML analysis
+  // Run ML analysis and notify backend
   const runAnalysis = async () => {
     if (sensorData.length === 0) return;
     setLoading(true);
@@ -123,22 +109,35 @@ const fetchPredictions = async () => {
       formData.append("tabular_data", JSON.stringify(payload));
       if (file) formData.append("file", file);
 
+      // ML prediction request
       const res = await fetch("http://localhost:8000/rockfall/predict", {
         method: "POST",
         body: formData,
       });
-
       if (!res.ok) throw new Error("Prediction request failed");
       const result = await res.json();
 
       // Save prediction in DB
-      await fetch("http://localhost:3000/api/prediction", {
+      const saveRes = await fetch("http://localhost:3000/api/prediction", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ siteId: SITE_ID, ...result }),
       });
+      if (!saveRes.ok) throw new Error("Failed to save prediction");
+      const savedPrediction = await saveRes.json();
 
-      // Refresh predictions
+      // Notify backend about new prediction (backend handles cooldown + redundancy)
+      await fetch("/api/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          siteId: SITE_ID,
+          prediction: { ...result, _id: savedPrediction.data._id },
+          level: result.risk_levels[0] || "Low",
+        }),
+      });
+
+      // Refresh predictions for dashboard
       fetchPredictions();
     } catch (err) {
       console.error("Error in ML pipeline:", err);
@@ -147,7 +146,7 @@ const fetchPredictions = async () => {
     }
   };
 
-  // Auto refresh every 5 min
+  // Auto-refresh sensor data & predictions every 5 min
   useEffect(() => {
     fetchSensorData();
     fetchPredictions();
@@ -160,9 +159,7 @@ const fetchPredictions = async () => {
 
   // Chart Data
   const timestamps = predictions
-    .map((p) =>
-      p.createdAt ? new Date(p.createdAt).toLocaleTimeString() : "N/A"
-    )
+    .map((p) => (p.createdAt ? new Date(p.createdAt).toLocaleTimeString() : "N/A"))
     .reverse();
 
   const probData = {
@@ -220,9 +217,8 @@ const fetchPredictions = async () => {
         </button>
       </div>
 
-      {/* Sensor + Prediction Summary */}
+      {/* Latest Sensor Data & Prediction */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Latest Sensor Data */}
         <div className="bg-gray-800 p-4 rounded-lg">
           <h2 className="text-xl font-semibold mb-3">Latest Sensor Data</h2>
           {sensorData.length > 0 ? (
@@ -244,7 +240,6 @@ const fetchPredictions = async () => {
           )}
         </div>
 
-        {/* Last Prediction */}
         <div className="bg-gray-800 p-4 rounded-lg">
           <h2 className="text-xl font-semibold mb-3">Latest Prediction</h2>
           {predictions.length > 0 ? (
