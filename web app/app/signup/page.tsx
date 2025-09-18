@@ -1,39 +1,39 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { FaLock } from 'react-icons/fa';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import React, { useState } from "react";
+import { FaLock } from "react-icons/fa";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 
 const defaultOrg = {
-  name: '',
-  email: '',
-  contact: '',
+  name: "",
+  email: "",
+  contact: "",
   registeredAddress: {
-    street: '',
-    city: '',
-    state: '',
-    zip: '',
-    country: '',
+    street: "",
+    city: "",
+    state: "",
+    zip: "",
+    country: "",
   },
-  corporationIdentificationNumber: '',
-  registrationType: '',
+  corporationIdentificationNumber: "",
+  registrationType: "",
 };
 const defaultSite = {
-  name: '',
-  location: '',
+  name: "",
+  location: "",
   coordinates: {
-    latitude: '',
-    longitude: '',
+    latitude: "",
+    longitude: "",
   },
-  businessProofLicense: '',
+  businessProofLicense: "",
 };
 const defaultEmp = {
-  name: '',
-  email: '',
-  designation: '',
-  password: '',
+  name: "",
+  email: "",
+  designation: "",
+  password: "",
 };
 
 export default function SignupPage() {
@@ -45,7 +45,7 @@ export default function SignupPage() {
   
   const handleOrganizationChange = (e) => {
     const { name, value } = e.target;
-    if (['street', 'city', 'state', 'zip', 'country'].includes(name)) {
+    if (["street", "city", "state", "zip", "country"].includes(name)) {
       setOrganizationData((prev) => ({
         ...prev,
         registeredAddress: { ...prev.registeredAddress, [name]: value },
@@ -61,7 +61,7 @@ export default function SignupPage() {
   
   const handleSiteChange = (e) => {
     const { name, value } = e.target;
-    if (['latitude', 'longitude'].includes(name)) {
+    if (["latitude", "longitude"].includes(name)) {
       setSiteData((prev) => ({
         ...prev,
         coordinates: { ...prev.coordinates, [name]: value },
@@ -100,21 +100,24 @@ export default function SignupPage() {
         employeeData,
       };
 
-      console.log('Payload being sent:', payload);
+      console.log("Payload being sent:", payload);
 
-      const res = await fetch('http://localhost:3000/api/organisation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("http://localhost:3000/api/organisation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
         throw new Error(`HTTP error! Status: ${res.status}`);
       }
+      if (!res.ok) {
+        throw new Error(`HTTP error! Status: ${res.status}`);
+      }
 
-      router.push('/dashboard');
+      router.push("/dashboard");
     } catch (error) {
-      console.error('Failed to create account:', error);
+      console.error("Failed to create account:", error);
     }
   };
 
@@ -307,6 +310,7 @@ export default function SignupPage() {
           </div>
         </div>
       </div>
+
       <div className="mt-10 text-center">
         <button
           type="submit"
@@ -316,7 +320,7 @@ export default function SignupPage() {
         </button>
         <div className="text-sm text-gray-600 mt-6">
           <p>
-            Already have an account?{' '}
+            Already have an account?{" "}
             <Link
               href="/login"
               className="text-[#645e54] hover:text-[#868172] font-semibold transition-colors"

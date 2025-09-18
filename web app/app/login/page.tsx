@@ -1,21 +1,21 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { FaLock } from 'react-icons/fa';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from "react";
+import { FaLock } from "react-icons/fa";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const router = useRouter();
 
   
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const employeeId = localStorage.getItem('employeeId');
-      const organizationId = localStorage.getItem('organizationId');
-      const siteId = localStorage.getItem('siteId');
+    if (typeof window !== "undefined") {
+      const employeeId = localStorage.getItem("employeeId");
+      const organizationId = localStorage.getItem("organizationId");
+      const siteId = localStorage.getItem("siteId");
 
       if (employeeId && organizationId && siteId) {
         router.replace('/dashboard');
@@ -25,17 +25,18 @@ const LoginPage = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Attempting to send login request...");
 
     try {
-      const response = await fetch('http://localhost:3000/api/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("http://localhost:3000/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       if (!response.ok) {
         const text = await response.text();
-        let errorMessage = 'Login failed.';
+        let errorMessage = "Login failed.";
         try {
           const errorData = JSON.parse(text);
           errorMessage = errorData.message || errorMessage;
@@ -46,6 +47,7 @@ const LoginPage = () => {
       }
 
       const data = await response.json();
+      console.log("Login successful:", data);
 
       
       if (typeof window !== 'undefined') {
@@ -57,7 +59,7 @@ const LoginPage = () => {
       
       router.push('/dashboard');
     } catch (error: any) {
-      console.error('Login error:', error);
+      console.error("Login error:", error);
       alert(error.message);
     }
   };
@@ -109,7 +111,7 @@ const LoginPage = () => {
         </form>
         <div className="text-center mt-6 text-sm text-gray-600">
           <p>
-            Don&apos;t have an account?{' '}
+            Don&apos;t have an account?{" "}
             <Link
               href="/signup"
               className="text-[#645e54] hover:text-[#868172] font-semibold transition-colors"
