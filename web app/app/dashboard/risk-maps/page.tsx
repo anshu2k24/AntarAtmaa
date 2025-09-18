@@ -65,17 +65,32 @@ export default function RiskDashboard() {
     }
   };
 
-  // Fetch predictions
-  const fetchPredictions = async () => {
-    try {
-      const res = await fetch(`/api/prediction?siteId=${SITE_ID}`);
-      if (!res.ok) throw new Error("Failed to fetch predictions");
-      const data = await res.json();
-      setPredictions(data.data || []);
-    } catch (err) {
-      console.error("Error fetching predictions:", err);
+// Inside fetchPredictions
+const fetchPredictions = async () => {
+  try {
+    const res = await fetch(`/api/prediction?siteId=${SITE_ID}`);
+    if (!res.ok) throw new Error("Failed to fetch predictions");
+    const data = await res.json();
+    setPredictions(data.data || []);
+
+    // ⏩ Trigger mail notification on refresh if prediction exists
+    if (data.data && data.data.length > 0) {
+      const latestPrediction = data.data[0];
+      await fetch("/api/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          siteId: SITE_ID,
+          prediction: latestPrediction,
+          level: latestPrediction.risk_levels[0] || "Low",
+        }),
+      });
     }
-  };
+  } catch (err) {
+    console.error("Error fetching predictions:", err);
+  }
+};
+
 
   // Run ML analysis
   const runAnalysis = async () => {
