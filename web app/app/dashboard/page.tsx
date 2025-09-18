@@ -13,14 +13,14 @@ const DashboardPage = () => {
       const siteId = localStorage.getItem('siteId');
 
       if (!employeeId || !organizationId || !siteId) {
-        router.replace('/login'); // redirect to login if missing
+        router.replace('/login');
       } else {
-        router.replace('/dashboard/risk-maps'); // redirect logged-in users
+        router.replace('/dashboard/risk-maps'); 
       }
     }
   }, [router]);
 
-  return null; // nothing rendered, just redirect
+  return null; 
 };
 
 export default DashboardPage;

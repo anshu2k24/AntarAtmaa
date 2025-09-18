@@ -54,14 +54,14 @@ const AlertsPage = () => {
 
   const getBorderColor = (level: string) => {
     switch (level) {
-      case "High": return "#ef4444"; // red
-      case "Medium": return "#eab308"; // yellow
-      case "Low": return "#22c55e"; // green
-      default: return "#6b7280"; // gray fallback
+      case "High": return "#ef4444"; 
+      case "Medium": return "#eab308"; 
+      case "Low": return "#22c55e"; 
+      default: return "#d1d5db"; 
     }
   };
 
-  // Chart: Alert Trends (count per date by level)
+  
   const trendData = useMemo(() => {
     const counts: Record<string, { Low: number; Medium: number; High: number }> = {};
     alerts.forEach((a) => {
@@ -81,7 +81,7 @@ const AlertsPage = () => {
     };
   }, [alerts]);
 
-  // Chart: Distribution (total count of each level)
+ 
   const distributionData = useMemo(() => {
     const counts = { Low: 0, Medium: 0, High: 0 };
     alerts.forEach((a) => counts[a.level] += 1);
@@ -99,48 +99,48 @@ const AlertsPage = () => {
   }, [alerts]);
 
   return (
-    <div className="p-6 space-y-8 text-white bg-gray-900 min-h-screen">
+    <div className="p-6 space-y-8 text-gray-800 bg-[#f2f0ea] min-h-screen">
       <h1 className="text-3xl font-bold">🚨 Alerts & Notifications</h1>
-      <p className="text-gray-400">Live updates from site predictions</p>
+      <p className="text-gray-600">Live updates from site predictions</p>
 
-      {/* Charts */}
+     
       {alerts.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-gray-800 p-4 rounded-lg">
+          <div className="bg-white p-4 rounded-lg border border-gray-200">
             <h2 className="text-lg mb-3">📈 Alert Trends</h2>
             <Line data={trendData} />
           </div>
-          <div className="bg-gray-800 p-4 rounded-lg">
+          <div className="bg-white p-4 rounded-lg border border-gray-200">
             <h2 className="text-lg mb-3">📊 Alert Distribution</h2>
             <Bar data={distributionData} />
           </div>
         </div>
       )}
 
-      {/* Alerts List */}
+      
       {!siteId ? (
-        <p className="text-yellow-500">⚠️ No site selected.</p>
+        <p className="text-orange-500">⚠️ No site selected.</p>
       ) : alerts.length === 0 ? (
-        <p className="text-gray-400">No alerts found for this site.</p>
+        <p className="text-gray-500">No alerts found for this site.</p>
       ) : (
         <div className="grid gap-6 md:grid-cols-2">
           {alerts.map((alert) => (
             <div
               key={alert._id}
-              className="bg-gray-800 p-6 rounded-lg shadow-lg border-l-4 relative"
+              className="bg-white p-6 rounded-lg shadow-lg border-l-4 relative border border-gray-200"
               style={{ borderColor: getBorderColor(alert.level) }}
             >
-              {/* SOS Button */}
+             
               <button className="absolute top-4 right-4 px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700">
                 SOS
               </button>
 
-              <h2 className="text-xl font-semibold text-white flex items-center">
+              <h2 className="text-xl font-semibold text-gray-700 flex items-center">
                 <FaExclamationCircle className="mr-2" />
                 {alert.level} Alert
               </h2>
 
-              <p className="text-sm text-gray-400 mt-2">{alert.message}</p>
+              <p className="text-sm text-gray-600 mt-2">{alert.message}</p>
 
               <div className="mt-3 text-xs text-gray-500 space-y-1">
                 <p className="flex items-center">

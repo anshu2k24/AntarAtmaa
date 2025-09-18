@@ -46,7 +46,7 @@ interface PredictionResponse {
   _id?: string;
 }
 
-const SITE_ID = "68c95e7cc0f82d6249f8d6b4"; // 🔧 replace later
+const SITE_ID = "68c95e7cc0f82d6249f8d6b4";
 
 export default function RiskDashboard() {
   const [sensorData, setSensorData] = useState<SensorData[]>([]);
@@ -54,7 +54,7 @@ export default function RiskDashboard() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Fetch sensor data
+  
   const fetchSensorData = async () => {
     try {
       const res = await fetch(`/api/iot?siteId=${SITE_ID}`);
@@ -66,7 +66,7 @@ export default function RiskDashboard() {
     }
   };
 
-  // Fetch predictions
+
   const fetchPredictions = async () => {
     try {
       const res = await fetch(`/api/prediction?siteId=${SITE_ID}`);
@@ -78,7 +78,7 @@ export default function RiskDashboard() {
     }
   };
 
-  // Run ML analysis and notify backend
+
   const runAnalysis = async () => {
     if (sensorData.length === 0) return;
     setLoading(true);
@@ -109,7 +109,6 @@ export default function RiskDashboard() {
       formData.append("tabular_data", JSON.stringify(payload));
       if (file) formData.append("file", file);
 
-      // ML prediction request
       const res = await fetch("http://localhost:8000/rockfall/predict", {
         method: "POST",
         body: formData,
@@ -117,7 +116,7 @@ export default function RiskDashboard() {
       if (!res.ok) throw new Error("Prediction request failed");
       const result = await res.json();
 
-      // Save prediction in DB
+  
       const saveRes = await fetch("http://localhost:3000/api/prediction", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -126,7 +125,7 @@ export default function RiskDashboard() {
       if (!saveRes.ok) throw new Error("Failed to save prediction");
       const savedPrediction = await saveRes.json();
 
-      // Notify backend about new prediction (backend handles cooldown + redundancy)
+      
       await fetch("/api/notify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -137,7 +136,7 @@ export default function RiskDashboard() {
         }),
       });
 
-      // Refresh predictions for dashboard
+     
       fetchPredictions();
     } catch (err) {
       console.error("Error in ML pipeline:", err);
@@ -146,7 +145,7 @@ export default function RiskDashboard() {
     }
   };
 
-  // Auto-refresh sensor data & predictions every 5 min
+  
   useEffect(() => {
     fetchSensorData();
     fetchPredictions();
@@ -157,7 +156,7 @@ export default function RiskDashboard() {
     return () => clearInterval(interval);
   }, []);
 
-  // Chart Data
+ 
   const timestamps = predictions
     .map((p) => (p.createdAt ? new Date(p.createdAt).toLocaleTimeString() : "N/A"))
     .reverse();
@@ -168,8 +167,8 @@ export default function RiskDashboard() {
       {
         label: "Rockfall Probability",
         data: predictions.map((p) => p.rockfall_probabilities[0] || 0).reverse(),
-        borderColor: "#3b82f6",
-        backgroundColor: "rgba(59,130,246,0.3)",
+        borderColor: "#a67c52", 
+        backgroundColor: "rgba(166,124,82,0.3)",
       },
     ],
   };
@@ -192,42 +191,42 @@ export default function RiskDashboard() {
   };
 
   return (
-    <div className="p-6 space-y-6 text-white bg-gray-900 min-h-screen">
-      <h1 className="text-3xl font-bold mb-4">⛰️ Rockfall Risk Dashboard</h1>
+    <div className="p-6 space-y-6 text-gray-800 bg-[#f2f0ea] min-h-screen">
+      <h1 className="text-3xl font-bold mb-4"> Rockfall Risk Dashboard</h1>
 
-      {/* Controls */}
+     
       <div className="flex items-center gap-4">
         <input
           type="file"
           accept="image/*"
           onChange={(e) => setFile(e.target.files?.[0] || null)}
-          className="block w-full text-sm text-gray-300
-                     file:mr-4 file:py-2 file:px-4
-                     file:rounded-full file:border-0
-                     file:text-sm file:font-semibold
-                     file:bg-blue-600 file:text-white
-                     hover:file:bg-blue-500"
+          className="block w-full text-sm text-gray-600
+            file:mr-4 file:py-2 file:px-4
+            file:rounded-full file:border-0
+            file:text-sm file:font-semibold
+            file:bg-orange-500 file:text-white
+            hover:file:bg-orange-400"
         />
         <button
           onClick={runAnalysis}
           disabled={loading}
-          className="px-4 py-2 bg-green-600 rounded hover:bg-green-500"
+          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500"
         >
           {loading ? "Analyzing..." : "Run Analysis"}
         </button>
       </div>
 
-      {/* Latest Sensor Data & Prediction */}
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-gray-800 p-4 rounded-lg">
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
           <h2 className="text-xl font-semibold mb-3">Latest Sensor Data</h2>
           {sensorData.length > 0 ? (
-            <ul className="space-y-1 text-sm">
+            <ul className="space-y-1 text-sm text-gray-700">
               {Object.entries(sensorData[0]).map(([key, value]) =>
                 key !== "timestamp" ? (
                   <li
                     key={key}
-                    className="flex justify-between border-b border-gray-700 py-1"
+                    className="flex justify-between border-b border-gray-300 py-1"
                   >
                     <span className="capitalize">{key.replace("_", " ")}:</span>
                     <span className="font-mono">{value as number}</span>
@@ -236,14 +235,14 @@ export default function RiskDashboard() {
               )}
             </ul>
           ) : (
-            <p className="text-gray-400">No sensor data available</p>
+            <p className="text-gray-500">No sensor data available</p>
           )}
         </div>
 
-        <div className="bg-gray-800 p-4 rounded-lg">
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
           <h2 className="text-xl font-semibold mb-3">Latest Prediction</h2>
           {predictions.length > 0 ? (
-            <div className="space-y-2 text-sm">
+            <div className="space-y-2 text-sm text-gray-700">
               <p>
                 <strong>Risk:</strong>{" "}
                 <span
@@ -268,33 +267,33 @@ export default function RiskDashboard() {
               </p>
             </div>
           ) : (
-            <p className="text-gray-400">No predictions yet</p>
+            <p className="text-gray-500">No predictions yet</p>
           )}
         </div>
       </div>
 
-      {/* Charts */}
+     
       {predictions.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-gray-800 p-4 rounded-lg">
+          <div className="bg-white p-4 rounded-lg border border-gray-200">
             <h2 className="text-xl mb-3">📈 Rockfall Probability Over Time</h2>
             <Line data={probData} />
           </div>
 
-          <div className="bg-gray-800 p-4 rounded-lg">
+          <div className="bg-white p-4 rounded-lg border border-gray-200">
             <h2 className="text-xl mb-3">📊 Risk Level Distribution</h2>
             <Bar data={riskData} />
           </div>
         </div>
       )}
 
-      {/* Last 5 Predictions */}
+     
       {predictions.length > 0 && (
-        <div className="bg-gray-800 p-4 rounded-lg">
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
           <h2 className="text-xl mb-3">Recent Predictions</h2>
           <table className="w-full text-sm text-left border-collapse">
             <thead>
-              <tr className="border-b border-gray-700">
+              <tr className="border-b border-gray-300">
                 <th className="py-2">Time</th>
                 <th>Risk</th>
                 <th>Probability</th>
@@ -303,7 +302,7 @@ export default function RiskDashboard() {
             </thead>
             <tbody>
               {predictions.slice(0, 5).map((p, i) => (
-                <tr key={i} className="border-b border-gray-700">
+                <tr key={i} className="border-b border-gray-200">
                   <td className="py-2">
                     {p.createdAt
                       ? new Date(p.createdAt).toLocaleTimeString()

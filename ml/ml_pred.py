@@ -10,10 +10,10 @@ import json
 
 app = FastAPI(title="Rockfall Fusion API")
 
-# ✅ Allow CORS (frontend at :3000 can hit :8000)
+# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # or ["http://localhost:3000"] for stricter security
+    allow_origins=["*"],  # or ["http://localhost:3000"] 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -83,7 +83,7 @@ async def fusion_predict(
             "yolo_detections": detections,
             "fusion_scores": fused_scores,
             "risk_levels": risk_levels,
-            "used_image": file is not None  # ✅ helpful flag
+            "used_image": file is not None
         }
 
     except Exception as e:

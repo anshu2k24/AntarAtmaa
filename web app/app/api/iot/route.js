@@ -3,7 +3,7 @@ import SensorData from '../../model/sensorDataModel';
 import Site from '../../model/siteModel';
 import { NextResponse } from 'next/server';
 
-// Route to add new sensor data
+
 export async function POST(req) {
   await dbConnect();
 
@@ -11,13 +11,13 @@ export async function POST(req) {
     const body = await req.json();
     const { siteId, temperature, rainfall, soil_moisture, vib_rms, porepressure, displacement } = body;
 
-    // Validate the existence of the associated site
+   
     const siteExists = await Site.findById(siteId);
     if (!siteExists) {
       return NextResponse.json({ message: 'Site not found.' }, { status: 404 });
     }
 
-    // Create a new sensor data document
+    
     const newSensorData = new SensorData({
       siteId,
       temperature,
@@ -41,12 +41,12 @@ export async function POST(req) {
   }
 }
 
-// Route to fetch sensor data for a specific site
+
 export async function GET(req) {
   await dbConnect();
 
   try {
-    // Extract siteId from the query parameters
+   
     const { searchParams } = new URL(req.url);
     const siteId = searchParams.get('siteId');
 
@@ -54,7 +54,7 @@ export async function GET(req) {
       return NextResponse.json({ message: 'Site ID is required.' }, { status: 400 });
     }
 
-    // Find all sensor data documents associated with the siteId
+    
     const sensorData = await SensorData.find({ siteId }).sort({ timestamp: -1 });
 
     if (!sensorData || sensorData.length === 0) {

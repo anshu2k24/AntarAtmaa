@@ -5,7 +5,7 @@ import Employee from '../../model/employeeModel';
 import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 
-// ✅ POST: Create Organization, Site, and Employee
+
 export async function POST(req) {
   await dbConnect();
   const session = await mongoose.startSession();
@@ -15,19 +15,19 @@ export async function POST(req) {
     const body = await req.json();
     const { organizationData, siteData, employeeData } = body;
 
-    // 1. Create Organization
+   
     const [org] = await Organization.create([{ ...organizationData }], { session });
 
-    // 2. Create Site linked to Organization
+    
     const [site] = await Site.create([{ ...siteData, organizationId: org._id }], { session });
 
-    // 3. Create Employee linked to Organization & Site
+    
     const [emp] = await Employee.create(
       [{ ...employeeData, organizationId: org._id, linkedSites: [site._id] }],
       { session }
     );
 
-    // 4. Update references
+   
     org.sites.push(site._id);
     org.employees.push(emp._id);
     await org.save({ session });
@@ -35,7 +35,7 @@ export async function POST(req) {
     site.linkedEmployees.push(emp._id);
     await site.save({ session });
 
-    // 5. Commit transaction
+    
     await session.commitTransaction();
 
     return NextResponse.json(
@@ -51,13 +51,13 @@ export async function POST(req) {
   }
 }
 
-// ✅ GET: Fetch details by IDs
+
 export async function GET(req) {
   try {
     await dbConnect();
 
     const { searchParams } = new URL(req.url);
-    // Accepts either "organizationId" or "id" for flexibility
+    
     const organizationId = searchParams.get('organizationId') || searchParams.get('id');
     const siteId = searchParams.get('siteId');
     const employeeId = searchParams.get('employeeId');
@@ -69,7 +69,7 @@ export async function GET(req) {
       );
     }
 
-    // Fetch organization, site, and employee
+   
     const org = await Organization.findById(organizationId).lean();
     const site = await Site.findById(siteId).lean();
     const emp = await Employee.findById(employeeId).lean();
