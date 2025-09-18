@@ -54,7 +54,7 @@ Built with **Next.js + Tailwind**:
 * Secure data handling with **MongoDB + backend APIs**
 * Unified **single source of truth** for all mine data
 
-## 🖥️ Tech Stack
+## Tech Stack
 
 **Frontend:** ![Next.js](https://skillicons.dev/icons?i=nextjs) ![Tailwind](https://skillicons.dev/icons?i=tailwind)
 **Backend:** ![Node.js](https://skillicons.dev/icons?i=nodejs) ![MongoDB](https://skillicons.dev/icons?i=mongodb)
@@ -79,49 +79,31 @@ Built with **Next.js + Tailwind**:
 git clone https://github.com/anshu2k24/AntarAtmaa.git
 cd antaratmaa
 
-# Backend
-cd backend
-npm install
-cp .env.example .env
-npm start
-
 # Frontend
 cd ../web-app
 npm install
-cp .env.example .env.local
 npm run dev
+
+create a .env file with the following content:
+MONGODB_URI=
+ALERT_EMAIL_USER=
+ALERT_EMAIL_PASS=
+ALERT_RECEIVER_EMAIL=
+TWILIO_SID=
+TWILIO_AUTH_TOKEN=
+TWILIO_PHONE=
+ALERT_RECEIVER_PHONE=
+
 
 # ML Model
 cd ../ml
-# Place .pt models (e.g., vision_rocks_cracks.pt)
 python ml_pred.py
-```
-
-### Quick Run
-
-```bash
-# Run frontend directly
-git clone https://github.com/anshu2k24/AntarAtmaa.git && cd antaratmaa/web-app && npm i && npm run dev
-
-# Run ML prediction
-cd antaratmaa/ml && pip install -r requirements.txt && python ml_pred.py
 ```
 
 ## Python Dependencies
 
 ```bash
 pip install uvicorn pandas xgboost fastapi ultralytics pillow
-```
-
-```python
-import uvicorn
-import pandas as pd
-import xgboost as xgb
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form
-from fastapi.middleware.cors import CORSMiddleware
-from ultralytics import YOLO
-from PIL import Image
-import io, json
 ```
 
 ## 🗂 Folder Structure
@@ -132,7 +114,7 @@ import io, json
 ├── ml/         # ML models, datasets, training scripts
 ```
 
-## 👨‍💻 Team Antaratmaa
+## Team Antaratmaa
 
 We are passionate innovators with expertise in **AI, web dev, and IoT**—working to transform mining safety.
 **Mission:** Make mining safer, smarter, and sustainable.
@@ -149,10 +131,10 @@ We are passionate innovators with expertise in **AI, web dev, and IoT**—workin
 ## Contact
 
 For collaborations & inquiries:
-📧 [mail2panshu@gmail.com](mailto:mail2panshu@gmail.com)
+ [mail2panshu@gmail.com](mailto:mail2panshu@gmail.com)
 
 ---
 
-⚡ Built with vision, passion, and impact for **SIH 2025**
-🔗 [GitHub Repository](https://github.com/anshu2k24/AntarAtmaa)
+ Built with vision, passion, and impact for **SIH 2025**
+ [GitHub Repository](https://github.com/anshu2k24/AntarAtmaa)
 
