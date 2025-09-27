@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, ChangeEvent, FormEvent } from "react";
 import { FaLock } from "react-icons/fa";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
 
 const defaultOrg = {
   name: "",
@@ -42,8 +41,9 @@ export default function SignupPage() {
   const [employeeData, setEmployeeData] = useState(defaultEmp);
   const router = useRouter();
 
-  
-  const handleOrganizationChange = (e) => {
+  const handleOrganizationChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     if (["street", "city", "state", "zip", "country"].includes(name)) {
       setOrganizationData((prev) => ({
@@ -58,8 +58,9 @@ export default function SignupPage() {
     }
   };
 
-  
-  const handleSiteChange = (e) => {
+  const handleSiteChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     if (["latitude", "longitude"].includes(name)) {
       setSiteData((prev) => ({
@@ -74,7 +75,9 @@ export default function SignupPage() {
     }
   };
 
-  const handleEmployeeChange = (e) => {
+  const handleEmployeeChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setEmployeeData((prev) => ({
       ...prev,
@@ -82,8 +85,7 @@ export default function SignupPage() {
     }));
   };
 
- 
-  const handleCreateAccount = async (e) => {
+  const handleCreateAccount = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const payload = {
@@ -108,9 +110,6 @@ export default function SignupPage() {
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) {
-        throw new Error(`HTTP error! Status: ${res.status}`);
-      }
       if (!res.ok) {
         throw new Error(`HTTP error! Status: ${res.status}`);
       }
