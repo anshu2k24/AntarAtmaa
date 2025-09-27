@@ -24,8 +24,19 @@ ChartJS.register(
   Legend
 );
 
+// ✅ Strong typing for alerts
+type AlertLevel = "Low" | "Medium" | "High";
+
+interface Alert {
+  _id: string;
+  createdAt: string;
+  level: AlertLevel;
+  message: string;
+  sentTo?: string[];
+}
+
 const AlertsPage = () => {
-  const [alerts, setAlerts] = useState<any[]>([]);
+  const [alerts, setAlerts] = useState<Alert[]>([]);
   const [siteId, setSiteId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -52,7 +63,7 @@ const AlertsPage = () => {
     return () => clearInterval(interval);
   }, [siteId]);
 
-  const getBorderColor = (level: string) => {
+  const getBorderColor = (level: AlertLevel) => {
     switch (level) {
       case "High": return "#ef4444"; 
       case "Medium": return "#eab308"; 
@@ -61,9 +72,8 @@ const AlertsPage = () => {
     }
   };
 
-  
   const trendData = useMemo(() => {
-    const counts: Record<string, { Low: number; Medium: number; High: number }> = {};
+    const counts: Record<string, Record<AlertLevel, number>> = {};
     alerts.forEach((a) => {
       const date = new Date(a.createdAt).toLocaleDateString();
       if (!counts[date]) counts[date] = { Low: 0, Medium: 0, High: 0 };
@@ -81,9 +91,8 @@ const AlertsPage = () => {
     };
   }, [alerts]);
 
- 
   const distributionData = useMemo(() => {
-    const counts = { Low: 0, Medium: 0, High: 0 };
+    const counts: Record<AlertLevel, number> = { Low: 0, Medium: 0, High: 0 };
     alerts.forEach((a) => counts[a.level] += 1);
 
     return {
@@ -103,7 +112,6 @@ const AlertsPage = () => {
       <h1 className="text-3xl font-bold">🚨 Alerts & Notifications</h1>
       <p className="text-gray-600">Live updates from site predictions</p>
 
-     
       {alerts.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white p-4 rounded-lg border border-gray-200">
@@ -117,7 +125,6 @@ const AlertsPage = () => {
         </div>
       )}
 
-      
       {!siteId ? (
         <p className="text-orange-500">⚠️ No site selected.</p>
       ) : alerts.length === 0 ? (
@@ -130,7 +137,6 @@ const AlertsPage = () => {
               className="bg-white p-6 rounded-lg shadow-lg border-l-4 relative border border-gray-200"
               style={{ borderColor: getBorderColor(alert.level) }}
             >
-             
               <button className="absolute top-4 right-4 px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700">
                 SOS
               </button>
