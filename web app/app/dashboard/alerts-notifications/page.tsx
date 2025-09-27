@@ -65,10 +65,10 @@ const AlertsPage = () => {
 
   const getBorderColor = (level: AlertLevel) => {
     switch (level) {
-      case "High": return "#ef4444"; 
-      case "Medium": return "#eab308"; 
-      case "Low": return "#22c55e"; 
-      default: return "#d1d5db"; 
+      case "High": return "#ef4444";
+      case "Medium": return "#eab308";
+      case "Low": return "#22c55e";
+      default: return "#d1d5db";
     }
   };
 
@@ -153,13 +153,14 @@ const AlertsPage = () => {
                   <FaClock className="mr-2" />
                   {new Date(alert.createdAt).toLocaleString()}
                 </p>
-                {alert.sentTo?.length > 0 && (
+                {(alert.sentTo?.length ?? 0) > 0 && (
                   <p className="flex items-center">
                     <FaUsers className="mr-2" />
-                    Sent to: {alert.sentTo.join(", ")}
+                    Sent to: {(alert.sentTo ?? []).join(", ")}
                   </p>
                 )}
               </div>
+
             </div>
           ))}
         </div>
