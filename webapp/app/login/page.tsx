@@ -28,7 +28,7 @@ const LoginPage = () => {
     console.log("Attempting to send login request...");
 
     try {
-      const response = await fetch("http://localhost:3000/api/auth", {
+      const response = await fetch("http://ganiai.vercel.app/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

@@ -117,7 +117,7 @@ export default function RiskDashboard() {
       const result = await res.json();
 
   
-      const saveRes = await fetch("http://localhost:3000/api/prediction", {
+      const saveRes = await fetch("http://ganiai.vercel.app/api/prediction", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ siteId: SITE_ID, ...result }),

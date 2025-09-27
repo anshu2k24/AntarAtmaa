@@ -104,7 +104,7 @@ export default function SignupPage() {
 
       console.log("Payload being sent:", payload);
 
-      const res = await fetch("http://localhost:3000/api/organisation", {
+      const res = await fetch("http://ganiai.vercel.app/api/organisation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
