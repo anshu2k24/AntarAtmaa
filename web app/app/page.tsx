@@ -7,21 +7,22 @@ import CallToActionSection from "@/components/CallToActionSection";
 import Footer from "@/components/Footer";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import Header from "@/components/Header";
 
 export default function Home() {
   const { theme, setTheme } = useTheme();
 
   return (
     <>
-    <main className="bg-background text-foreground">
-
-      <Hero />
-      <Features />
-      <About />
-      <Reviews />
-      <CallToActionSection />
-      <Footer />
-    </main>
+      <main className="bg-background text-foreground">
+        <Header />
+        <Hero />
+        <Features />
+        <About />
+        <Reviews />
+        <CallToActionSection />
+        <Footer />
+      </main>
     </>
   );
 }
