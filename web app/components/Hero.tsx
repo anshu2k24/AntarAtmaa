@@ -8,7 +8,7 @@ const HeroSection = () => {
         <div className="container mx-auto flex items-center">
           <div className="flex items-center space-x-2">
             <Image
-              src="/logofinal.png"
+              src="/image.png"
               alt="RockSafe AI Logo"
               width={500}
               height={500}

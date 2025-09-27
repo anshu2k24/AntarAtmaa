@@ -100,7 +100,7 @@ const AlertsPage = () => {
 
   return (
     <div className="p-6 space-y-8 text-gray-800 bg-[#f2f0ea] min-h-screen">
-      <h1 className="text-3xl font-bold">🚨 Alerts & Notifications</h1>
+      <h1 className="text-3xl font-bold"> Alerts & Notifications</h1>
       <p className="text-gray-600">Live updates from site predictions</p>
 
      

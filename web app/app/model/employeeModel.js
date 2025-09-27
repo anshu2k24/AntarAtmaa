@@ -9,7 +9,9 @@ const employeeSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
+    trim: true,
+    lowercase: true
   },
   designation: {
     type: String,
@@ -28,14 +30,20 @@ const employeeSchema = new mongoose.Schema({
   linkedSites: [{
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Site'
-  }]
+  }],
+  isApproved: {
+    type: Boolean,
+    default: false
+  },
+  approvedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Admin'
+  }
 }, {
   timestamps: true
 });
 
-
 employeeSchema.pre('save', async function(next) {
-  
   if (!this.isModified('password')) {
     return next();
   }
@@ -43,6 +51,5 @@ employeeSchema.pre('save', async function(next) {
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
-
 
 export default mongoose.models.Employee || mongoose.model('Employee', employeeSchema);
