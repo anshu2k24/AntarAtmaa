@@ -8,59 +8,61 @@ import { useRouter } from "next/navigation";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const employeeId = localStorage.getItem("employeeId");
-      const organizationId = localStorage.getItem("organizationId");
-      const siteId = localStorage.getItem("siteId");
-
-      if (employeeId && organizationId && siteId) {
+      const role = localStorage.getItem("role");
+      if (role === 'admin' && localStorage.getItem('adminId')) {
+        router.replace('/admin/dashboard');
+      } else if (role === 'employee' && localStorage.getItem('employeeId')) {
         router.replace('/dashboard');
       }
     }
   }, [router]);
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
-    console.log("Attempting to send login request...");
+    setIsLoading(true);
+    setError("");
 
     try {
-      const response = await fetch("http://localhost:3000/api/auth", {
+      const response = await fetch("/api/auth", { // Using relative path is better
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
-      if (!response.ok) {
-        const text = await response.text();
-        let errorMessage = "Login failed.";
-        try {
-          const errorData = JSON.parse(text);
-          errorMessage = errorData.message || errorMessage;
-        } catch {
-          errorMessage = text || errorMessage;
-        }
-        throw new Error(errorMessage);
-      }
-
       const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || "Login failed. Please check your credentials.");
+        return;
+      }
+      
       console.log("Login successful:", data);
 
-      
       if (typeof window !== 'undefined') {
-        localStorage.setItem('employeeId', data.employeeId);
-        localStorage.setItem('organizationId', data.organizationId);
-        localStorage.setItem('siteId', data.siteId);
+        localStorage.setItem('role', data.role);
+        
+        if (data.role === 'admin') {
+          localStorage.setItem('adminId', data.adminId);
+          router.push('/approval');
+        } else if (data.role === 'employee') {
+          localStorage.setItem('employeeId', data.employeeId);
+          localStorage.setItem('organizationId', data.organizationId);
+          localStorage.setItem('siteId', data.siteId);
+          router.push('/dashboard');
+        }
       }
-
       
-      router.push('/dashboard');
-    } catch (error: any) {
-      console.error("Login error:", error);
-      alert(error.message);
+    } catch (err) {
+      console.error("Login fetch error:", err);
+      setError("A network error occurred. Please try again later.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -102,11 +104,17 @@ const LoginPage = () => {
               required
             />
           </div>
+          
+          {error && (
+            <p className="text-red-500 text-sm text-center">{error}</p>
+          )}
+
           <button
             type="submit"
-            className="w-full bg-[#645e54] hover:bg-[#868172] text-white font-semibold py-3 rounded-lg transition-colors shadow-md hover:shadow-lg"
+            disabled={isLoading}
+            className="w-full bg-[#645e54] hover:bg-[#868172] text-white font-semibold py-3 rounded-lg transition-colors shadow-md hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            Sign In
+            {isLoading ? "Signing In..." : "Sign In"}
           </button>
         </form>
         <div className="text-center mt-6 text-sm text-gray-600">

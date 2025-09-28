@@ -1,9 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
+import Header from "./Header";
 
 const HeroSection = () => {
   return (
     <div className="relative bg-[#f9f5f0] text-gray-900 min-h-screen flex flex-col">
+      <Header/>
       {/* Hero Content */}
       <section className="flex flex-grow items-center justify-center p-8 lg:p-12">
         <div className="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center pt-14">
