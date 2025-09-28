@@ -8,7 +8,7 @@ const Help = () => {
       <div className="bg-[#f9f5f0] min-h-screen py-16 px-6 lg:px-20">
         {/* Header */}
         <div className="text-center mb-20">
-          <h1 className="text-5xl font-extrabold text-gray-900 mb-6 pt-8">
+          <h1 className="text-5xl font-extrabold text-gray-900 mb-6 pt-16">
             Help & Documentation
           </h1>
           <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
@@ -178,7 +178,7 @@ const Help = () => {
               <div className="text-center border-2 border-[#4a5a3c] rounded-3xl p-2">
                 <p className="mb-3 text-black font-semibold">After Data</p>
                 <Image
-                  src="/docs/risk-filled.png"
+                  src="/risk-filled.jpg"
                   alt="Risk Board Filled"
                   width={500}
                   height={300}
@@ -186,6 +186,22 @@ const Help = () => {
                 />
               </div>
             </div>
+
+            <div className="mt-6 text-center">
+              <h3 className="text-xl text-black font-semibold mb-4">
+                Watch Video Guide
+              </h3>
+              <div className="relative mx-auto w-200 aspect-video" style={{ paddingTop: "56.25%" }}>
+                <iframe
+                  className="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"
+                  src="https://www.youtube.com/embed/SCl2buFa5ds?si=Sadudp0i7fAJjXki"
+                  title="Risk Board Tutorial"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            </div>
+
           </section>
 
           {/* Weather Section */}
@@ -242,6 +258,21 @@ const Help = () => {
                 />
               </div>
             </div>
+
+            <div className="mt-6 text-center">
+              <h3 className="text-xl text-black font-semibold mb-4">
+                Watch Video Guide
+              </h3>
+              <div className="relative mx-auto w-200 aspect-video" style={{ paddingTop: "56.25%" }}>
+                <iframe
+                  className="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"
+                  src="https://www.youtube.com/embed/zfWK2i65U1w?si=kZPwVy7iZI1WHYaO"
+                  title="Risk Board Tutorial"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            </div>
           </section>
 
           {/* Notifications Section */}
@@ -253,8 +284,8 @@ const Help = () => {
               RockSafe AI sends instant alerts for critical hazards and updates:
             </p>
             <ul className="list-disc list-inside text-gray-700 mb-8 space-y-2">
-              <li>Email notifications for new risks detected.</li>
-              <li>SMS alerts for high-priority hazards.</li>
+              <li>Email and SMS notifications for new risks detected.</li>
+              <li className="font-semibold">Call alerts if Medium or High risks are detected.</li>
               <li>Dashboard pop-ups for real-time updates.</li>
               <li>
                 Customize alert preferences in the{" "}
@@ -265,6 +296,30 @@ const Help = () => {
               <strong>Tip:</strong> Enable both email and SMS notifications to
               never miss critical alerts.
             </p>
+
+            {/* Two Image Cards */}
+            <div className="grid md:grid-cols-2 gap-10">
+              <div className="text-center border-2 border-[#4a5a3c] rounded-3xl p-2">
+                <p className="mb-3 text-black font-semibold">Alerts</p>
+                <Image
+                  src="/alert1.jpg"
+                  alt="Email Notification Example"
+                  width={500}
+                  height={300}
+                  className="rounded-lg border shadow"
+                />
+              </div>
+              <div className="text-center border-2 border-[#4a5a3c] rounded-3xl p-2">
+                <p className="mb-3 text-black font-semibold">SMS Alerts</p>
+                <Image
+                  src="/alert2.jpg"
+                  alt="SMS Alert Example"
+                  width={500}
+                  height={300}
+                  className="rounded-lg border shadow"
+                />
+              </div>
+            </div>
           </section>
 
           {/* Footer / Support */}
